@@ -6,9 +6,6 @@ Excella Trans
 
   ExCella TransはExcelファイルを利用したデータ移行支援ツールです。
 
-  最新版、各種ドキュメントは以下のサイトで公開しています。
-  http://sourceforge.jp/projects/excella-trans/
-
   ExCella Transは株式会社ビーブレイクシステムズが
   作成したオープンソースソフトウェアです。
 
