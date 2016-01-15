@@ -47,7 +47,6 @@ import org.junit.Test;
 public class DefaultSheetToSqlDataConverterTest {
 
     @Test
-    @SuppressWarnings( "unchecked")
     public final void testDefaultSheetToSqlDataConverter() throws ParseException, java.text.ParseException {
 
         Object object = null;

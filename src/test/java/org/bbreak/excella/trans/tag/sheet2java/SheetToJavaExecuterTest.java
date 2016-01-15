@@ -295,7 +295,6 @@ public class SheetToJavaExecuterTest extends WorkbookTest {
             assertNull( (( TestEntity1) results.get( 1)).getPropertyDate1());
             assertEquals( DateFormat.getDateInstance().parse( "2009/2/1"), (( TestEntity1) results.get( 2)).getPropertyDate1());
         } catch ( RuntimeException e1) {
-            // TODO Auto-generated catch block
             e1.printStackTrace();
         }
 

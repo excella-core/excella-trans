@@ -49,7 +49,6 @@ public class TestChildEntityParser extends SheetToJavaPropertyParser {
     }
 
     @Override
-    @SuppressWarnings( "unchecked")
     public void parse( Object object, Map<String, Cell> paramCellMap, Map<String, Object> paramValueMap) throws ParseException {
         TestEntity1 testEntity = ( TestEntity1) object;
 
