@@ -23,6 +23,7 @@ package org.bbreak.excella.trans.tag.sheet2java;
 import java.util.Map;
 
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.bbreak.excella.core.exception.ParseException;
 
 /**
@@ -77,7 +78,7 @@ public abstract class SheetToJavaPropertyParser {
         }
 
         // 文字列かつ、タグを含むセルの場合は処理対象
-        if ( tagCell.getCellType() == Cell.CELL_TYPE_STRING) {
+        if ( tagCell.getCellType() == CellType.STRING) {
             if ( tagCell.getStringCellValue().contains( tag)) {
                 return true;
             }
