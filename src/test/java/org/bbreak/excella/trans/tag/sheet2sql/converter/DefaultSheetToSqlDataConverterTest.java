@@ -84,7 +84,7 @@ public class DefaultSheetToSqlDataConverterTest {
         object = "あああ";
         try {
             result = converter.convert( object, dataType, settingInfo);
-            fail();
+            fail( "ParseException expected, but no exception was thrown.");
         } catch (ParseException pe) {
             // 例外が発生
         }
@@ -106,6 +106,7 @@ public class DefaultSheetToSqlDataConverterTest {
         object = new Double(10.5);
         try {
             result = converter.convert( object, dataType, settingInfo);
+            fail( "ParseException expected, but no exception was thrown.");
         } catch (ParseException pe) {
             // 例外が発生
         }
@@ -114,7 +115,7 @@ public class DefaultSheetToSqlDataConverterTest {
         object = "あああ";
         try {
             result = converter.convert( object, dataType, settingInfo);
-            fail();
+            fail( "ParseException expected, but no exception was thrown.");
         } catch (ParseException pe) {
             // 例外が発生
         }
@@ -214,7 +215,7 @@ public class DefaultSheetToSqlDataConverterTest {
         object = "あああ";
         try {
             result = converter.convert( object, dataType, settingInfo);
-            fail();
+            fail( "ParseException expected, but no exception was thrown.");
         } catch (ParseException pe) {
             // 例外が発生
         }
@@ -235,7 +236,7 @@ public class DefaultSheetToSqlDataConverterTest {
         object = "あああ";
         try {
             result = converter.convert( object, dataType, settingInfo);
-            fail();
+            fail( "ParseException expected, but no exception was thrown.");
         } catch (ParseException pe) {
             // 例外が発生
         }
@@ -257,7 +258,7 @@ public class DefaultSheetToSqlDataConverterTest {
         object = "あああ";
         try {
             result = converter.convert( object, dataType, settingInfo);
-            fail();
+            fail( "ParseException expected, but no exception was thrown.");
         } catch (ParseException pe) {
             // 例外が発生
         }
@@ -279,7 +280,7 @@ public class DefaultSheetToSqlDataConverterTest {
         object = "あああ";
         try {
             result = converter.convert( object, dataType, settingInfo);
-            fail();
+            fail( "ParseException expected, but no exception was thrown.");
         } catch (ParseException pe) {
             // 例外が発生
         }
@@ -317,7 +318,7 @@ public class DefaultSheetToSqlDataConverterTest {
         object = "あああ";
         try {
             result = converter.convert( object, dataType, settingInfo);
-            fail();
+            fail( "ParseException expected, but no exception was thrown.");
         } catch (ParseException pe) {
             // 例外が発生
         }

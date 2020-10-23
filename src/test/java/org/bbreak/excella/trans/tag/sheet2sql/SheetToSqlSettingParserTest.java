@@ -146,7 +146,7 @@ public class SheetToSqlSettingParserTest extends WorkbookTest {
         list.clear();
         try {
             list = parser.parse( sheet2, tagCell, data);
-            fail();
+            fail( "ParseException expected, but no exception was thrown.");
         } catch ( ParseException pe) {
             Cell cell = pe.getCell();
             assertEquals( 20, cell.getRow().getRowNum());
@@ -159,7 +159,7 @@ public class SheetToSqlSettingParserTest extends WorkbookTest {
         list.clear();
         try {
             list = parser.parse( sheet2, tagCell, data);
-            fail();
+            fail( "ParseException expected, but no exception was thrown.");
         } catch ( ParseException pe) {
             Cell cell = pe.getCell();
             assertEquals( 26, cell.getRow().getRowNum());
@@ -298,7 +298,7 @@ public class SheetToSqlSettingParserTest extends WorkbookTest {
         list.clear();
         try {
             list = parser.parse( sheet3, tagCell, data);
-            fail();
+            fail( "ParseException expected, but no exception was thrown.");
         } catch ( ParseException pe) {
             Cell cell = pe.getCell();
             assertEquals( 9, cell.getRow().getRowNum());
@@ -311,7 +311,7 @@ public class SheetToSqlSettingParserTest extends WorkbookTest {
         list.clear();
         try {
             list = parser.parse( sheet3, tagCell, data);
-            fail();
+            fail( "ParseException expected, but no exception was thrown.");
         } catch ( ParseException pe) {
             Cell cell = pe.getCell();
             assertEquals( 17, cell.getRow().getRowNum());
@@ -324,7 +324,7 @@ public class SheetToSqlSettingParserTest extends WorkbookTest {
         list.clear();
         try {
             list = parser.parse( sheet3, tagCell, data);
-            fail();
+            fail( "ParseException expected, but no exception was thrown.");
         } catch ( ParseException pe) {
             Cell cell = pe.getCell();
             assertEquals( 21, cell.getRow().getRowNum());
@@ -355,7 +355,7 @@ public class SheetToSqlSettingParserTest extends WorkbookTest {
         list.clear();
         try {
             list = parser.parse( sheet4, tagCell, data);
-            fail();
+            fail( "ParseException expected, but no exception was thrown.");
         } catch ( ParseException pe) {
             Cell cell = pe.getCell();
             assertEquals( 0, cell.getRow().getRowNum());
@@ -368,7 +368,7 @@ public class SheetToSqlSettingParserTest extends WorkbookTest {
         list.clear();
         try {
             list = parser.parse( sheet4, tagCell, data);
-            fail();
+            fail( "ParseException expected, but no exception was thrown.");
         } catch ( ParseException pe) {
             Cell cell = pe.getCell();
             assertEquals( 0, cell.getRow().getRowNum());
@@ -381,7 +381,7 @@ public class SheetToSqlSettingParserTest extends WorkbookTest {
         list.clear();
         try {
             list = parser.parse( sheet4, tagCell, data);
-            fail();
+            fail( "ParseEception expected, but no exception was thrown.");
         } catch ( ParseException pe) {
             Cell cell = pe.getCell();
             assertEquals( 15, cell.getRow().getRowNum());
@@ -394,7 +394,7 @@ public class SheetToSqlSettingParserTest extends WorkbookTest {
         list.clear();
         try {
             list = parser.parse( sheet4, tagCell, data);
-            fail();
+            fail( "ParseException expected, but no exception was thrown.");
         } catch ( ParseException pe) {
             Cell cell = pe.getCell();
             assertEquals( 15, cell.getRow().getRowNum());
@@ -425,7 +425,7 @@ public class SheetToSqlSettingParserTest extends WorkbookTest {
         list.clear();
         try {
             list = parser.parse( sheet5, tagCell, data);
-            fail();
+            fail( "ParseException expected, but no exception was thrown.");
         } catch ( ParseException pe) {
             Cell cell = pe.getCell();
             assertEquals( 4, cell.getRow().getRowNum());

@@ -141,7 +141,7 @@ public class SheetToSqlExecuterTest extends WorkbookTest {
         // No.3 第一引数にnullを指定
         try {
             executer.postParse( null, sheetParser, sheetData);
-            fail();
+            fail( "NullPointerException expected, but no exception was thrown.");
         } catch ( NullPointerException e) {
             // 例外が発生
         }
@@ -149,7 +149,7 @@ public class SheetToSqlExecuterTest extends WorkbookTest {
         // No.4 第二引数にnullを指定
         try {
             executer.postParse( sheet, null, sheetData);
-            fail();
+            fail( "NullPointerException expected, but no exception was thrown.");
         } catch ( NullPointerException e) {
             // 例外が発生
         }
@@ -157,7 +157,7 @@ public class SheetToSqlExecuterTest extends WorkbookTest {
         // No.5 第三引数にnullを指定
         try {
             executer.postParse( sheet, sheetParser, null);
-            fail();
+            fail( "NullPointerException expected, but no exception was thrown.");
         } catch ( NullPointerException e) {
             // 例外が発生
         }
@@ -187,7 +187,7 @@ public class SheetToSqlExecuterTest extends WorkbookTest {
 
         try {
             executer.postParse( sheet, sheetParser, sheetData);
-            fail();
+            fail( "ParseException expected, but no exception was thrown.");
         } catch ( ParseException pe) {
             // 例外が発生
             System.out.println( "No.7:" + pe);
@@ -219,7 +219,7 @@ public class SheetToSqlExecuterTest extends WorkbookTest {
 
         try {
             executer.postParse( sheet, sheetParser, sheetData);
-            fail();
+            fail( "ParseException expected, but no exception was thrown.");
         } catch ( ParseException pe) {
             // 例外が発生
             System.out.println( "No.8:" + pe);
@@ -330,7 +330,7 @@ public class SheetToSqlExecuterTest extends WorkbookTest {
 
         try {
             executer.postParse( sheet, sheetParser, sheetData);
-            fail();
+            fail( "ParseException expected, but no exception was thrown.");
         } catch ( ParseException pe) {
             Cell cell = pe.getCell();
             assertEquals( 0, cell.getRow().getRowNum());
@@ -364,7 +364,7 @@ public class SheetToSqlExecuterTest extends WorkbookTest {
 
         try {
             executer.postParse( sheet, sheetParser, sheetData);
-            fail();
+            fail( "NullPointerException expected, but no exception was thrown.");
         } catch ( NullPointerException e) {
             // 例外が発生
         }
@@ -385,7 +385,7 @@ public class SheetToSqlExecuterTest extends WorkbookTest {
 
         try {
             executer.postParse( sheet, sheetParser, sheetData);
-            fail();
+            fail( "NullPointerException expected, but no exception was thrown.");
         } catch ( NullPointerException e) {
             // 例外が発生
         }
@@ -406,7 +406,7 @@ public class SheetToSqlExecuterTest extends WorkbookTest {
 
         try {
             executer.postParse( sheet, sheetParser, sheetData);
-            fail();
+            fail( "NullPointerException expected, but no exception was thrown.");
         } catch ( NullPointerException e) {
             // 例外が発生
         }
@@ -427,7 +427,7 @@ public class SheetToSqlExecuterTest extends WorkbookTest {
 
         try {
             executer.postParse( sheet, sheetParser, sheetData);
-            fail();
+            fail( "NullPointerException expected, but no exception was thrown.");
         } catch ( NullPointerException e) {
             // 例外が発生
         }

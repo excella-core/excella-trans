@@ -88,7 +88,7 @@ public class SqlParserTest extends WorkbookTest {
         list.clear();
         try {
             list = sqlParser.parse( sheet, tagCell, data);
-            fail();
+            fail( "ParseException expected, but no exception was thrown.");
         } catch ( ParseException pe) {
             Cell cell = pe.getCell();
             assertEquals( 13, cell.getRow().getRowNum());

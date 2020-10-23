@@ -78,7 +78,7 @@ public class TransProcessorTest extends WorkbookTest {
         filePath = "";
         try {
             processor = new TransProcessor( filePath);
-            fail();
+            fail( "IOException expected, but no exception was thrown.");
         } catch ( IOException e) {
             // ファイル読込例外が発生
         }
@@ -113,7 +113,7 @@ public class TransProcessorTest extends WorkbookTest {
         sheetName = "Sheet2";
         try {
             processor.processSheet( sheetName, data);
-            fail();
+            fail( "NullPointerException expected, but no exception was thrown.");
         } catch ( NullPointerException e) {
             // 例外が発生
         }
@@ -121,7 +121,7 @@ public class TransProcessorTest extends WorkbookTest {
         // シート名にnullを設定
         try {
             processor.processSheet( null, data);
-            fail();
+            fail( "NullPointerException expected, but no exception was thrown.");
         } catch ( NullPointerException e) {
             // 例外が発生
         }

@@ -110,7 +110,7 @@ public class SheetToJavaParserTest extends WorkbookTest {
         list.clear();
         try {
             list = parser.parse( sheet2, tagCell, data);
-            fail();
+            fail( "ParseException expected, but no exception was thrown.");
         } catch ( ParseException pe) {
             Cell cell = pe.getCell();
             assertEquals( 11, cell.getRow().getRowNum());
@@ -123,7 +123,7 @@ public class SheetToJavaParserTest extends WorkbookTest {
         list.clear();
         try {
             list = parser.parse( sheet2, tagCell, data);
-            fail();
+            fail( "ParseException expected, but no exception was thrown.");
         } catch ( ParseException pe) {
             Cell cell = pe.getCell();
             assertEquals( 20, cell.getRow().getRowNum());
@@ -160,6 +160,7 @@ public class SheetToJavaParserTest extends WorkbookTest {
         list.clear();
         try {
             list = parser.parse( sheet2, tagCell, data);
+            fail( "ParseException expected, but no exception was thrown.");
         } catch ( ParseException pe) {
             Cell cell = pe.getCell();
             assertEquals( 42, cell.getRow().getRowNum());
@@ -172,6 +173,7 @@ public class SheetToJavaParserTest extends WorkbookTest {
         list.clear();
         try {
             list = parser.parse( sheet2, tagCell, data);
+            fail( "ParseException expected, but no exception was thrown.");
         } catch ( ParseException pe) {
             Cell cell = pe.getCell();
             assertEquals( 48, cell.getRow().getRowNum());
@@ -199,7 +201,7 @@ public class SheetToJavaParserTest extends WorkbookTest {
         list.clear();
         try {
             list = parser.parse( sheet3, tagCell, data);
-            fail();
+            fail( "ParseException expected, but no exception was thrown.");
         } catch ( ParseException pe) {
             Cell cell = pe.getCell();
             assertEquals( 9, cell.getRow().getRowNum());
@@ -212,7 +214,7 @@ public class SheetToJavaParserTest extends WorkbookTest {
         list.clear();
         try {
             list = parser.parse( sheet3, tagCell, data);
-            fail();
+            fail( "ParseException expected, but no exception was thrown.");
         } catch ( ParseException pe) {
             Cell cell = pe.getCell();
             assertEquals( 17, cell.getRow().getRowNum());
@@ -224,7 +226,7 @@ public class SheetToJavaParserTest extends WorkbookTest {
         list.clear();
         try {
             list = parser.parse( sheet3, tagCell, data);
-            fail();
+            fail( "ParseException expected, but no exception was thrown.");
         } catch ( ParseException pe) {
             Cell cell = pe.getCell();
             assertEquals( 21, cell.getRow().getRowNum());
@@ -237,7 +239,7 @@ public class SheetToJavaParserTest extends WorkbookTest {
         list.clear();
         try {
             list = parser.parse( sheet3, tagCell, data);
-            fail();
+            fail( "ParseException expected, but no exception was thrown.");
         } catch ( ParseException pe) {
             Cell cell = pe.getCell();
             assertEquals( 25, cell.getRow().getRowNum());
@@ -250,7 +252,7 @@ public class SheetToJavaParserTest extends WorkbookTest {
         list.clear();
         try {
             list = parser.parse( sheet3, tagCell, data);
-            fail();
+            fail( "ParseException expected, but no exception was thrown.");
         } catch ( ParseException pe) {
             Cell cell = pe.getCell();
             assertEquals( 29, cell.getRow().getRowNum());
@@ -263,7 +265,7 @@ public class SheetToJavaParserTest extends WorkbookTest {
         list.clear();
         try {
             list = parser.parse( sheet4, tagCell, data);
-            fail();
+            fail( "ParseException expected, but no exception was thrown.");
         } catch ( ParseException pe) {
             Cell cell = pe.getCell();
             assertEquals( 0, cell.getRow().getRowNum());
@@ -276,7 +278,7 @@ public class SheetToJavaParserTest extends WorkbookTest {
         list.clear();
         try {
             list = parser.parse( sheet4, tagCell, data);
-            fail();
+            fail( "ParseException expected, but no exception was thrown.");
         } catch ( ParseException pe) {
             Cell cell = pe.getCell();
             assertEquals( 0, cell.getRow().getRowNum());
@@ -289,7 +291,7 @@ public class SheetToJavaParserTest extends WorkbookTest {
         list.clear();
         try {
             list = parser.parse( sheet4, tagCell, data);
-            fail();
+            fail( "ParseException expected, but no exception was thrown.");
         } catch ( ParseException pe) {
             Cell cell = pe.getCell();
             assertEquals( 15, cell.getRow().getRowNum());
@@ -302,7 +304,7 @@ public class SheetToJavaParserTest extends WorkbookTest {
         list.clear();
         try {
             list = parser.parse( sheet4, tagCell, data);
-            fail();
+            fail( "ParseException expected, but no exception was thrown.");
         } catch ( ParseException pe) {
             Cell cell = pe.getCell();
             assertEquals( 15, cell.getRow().getRowNum());
@@ -329,7 +331,7 @@ public class SheetToJavaParserTest extends WorkbookTest {
         list.clear();
         try {
             list = parser.parse( sheet5, tagCell, data);
-            fail();
+            fail( "ParseException expected, but no exception was thrown.");
         } catch ( ParseException pe) {
             Cell cell = pe.getCell();
             assertEquals( 4, cell.getRow().getRowNum());

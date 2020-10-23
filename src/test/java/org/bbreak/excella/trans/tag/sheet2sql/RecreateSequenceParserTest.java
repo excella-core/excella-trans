@@ -84,7 +84,7 @@ public class RecreateSequenceParserTest extends WorkbookTest {
         list.clear();
         try {
             list = recreateSequenceParser.parse( sheet2, tagCell, data);
-            fail();
+            fail( "ParseException expected, but no exception was thrown.");
         } catch ( ParseException pe) {
             Cell cell = pe.getCell();
             assertEquals( 5, cell.getRow().getRowNum());
@@ -97,7 +97,7 @@ public class RecreateSequenceParserTest extends WorkbookTest {
         list.clear();
         try {
             list = recreateSequenceParser.parse( sheet2, tagCell, data);
-            fail();
+            fail( "ParseException expected, but no exception was thrown.");
         } catch ( ParseException pe) {
             Cell cell = pe.getCell();
             assertEquals( 16, cell.getRow().getRowNum());
@@ -110,7 +110,7 @@ public class RecreateSequenceParserTest extends WorkbookTest {
         list.clear();
         try {
             list = recreateSequenceParser.parse( sheet2, tagCell, data);
-            fail();
+            fail( "ParseException expected, but no exception was thrown.");
         } catch ( ParseException pe) {
             Cell cell = pe.getCell();
             assertEquals( 28, cell.getRow().getRowNum());
@@ -123,7 +123,7 @@ public class RecreateSequenceParserTest extends WorkbookTest {
         list.clear();
         try {
             list = recreateSequenceParser.parse( sheet2, tagCell, data);
-            fail();
+            fail( "ParseException expected, but no exception was thrown.");
         } catch ( ParseException pe) {
             Cell cell = pe.getCell();
             assertEquals( 41, cell.getRow().getRowNum());
@@ -136,7 +136,7 @@ public class RecreateSequenceParserTest extends WorkbookTest {
         list.clear();
         try {
             list = recreateSequenceParser.parse( sheet2, tagCell, data);
-            fail();
+            fail( "ParseException expected, but no exception was thrown.");
         } catch ( ParseException pe) {
             Cell cell = pe.getCell();
             assertEquals( 53, cell.getRow().getRowNum());
@@ -163,7 +163,7 @@ public class RecreateSequenceParserTest extends WorkbookTest {
         list.clear();
         try {
             list = recreateSequenceParser.parse( sheet2, tagCell, data);
-            fail();
+            fail( "ParseException expected, but no exception was thrown.");
         } catch ( ParseException pe) {
             Cell cell = pe.getCell();
             assertEquals( 90, cell.getRow().getRowNum());
@@ -176,7 +176,7 @@ public class RecreateSequenceParserTest extends WorkbookTest {
         list.clear();
         try {
             list = recreateSequenceParser.parse( sheet2, tagCell, data);
-            fail();
+            fail( "ParseException expected, but no exception was thrown.");
         } catch ( ParseException pe) {
             Cell cell = pe.getCell();
             assertEquals( 102, cell.getRow().getRowNum());
