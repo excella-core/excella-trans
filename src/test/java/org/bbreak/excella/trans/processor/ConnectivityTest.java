@@ -20,7 +20,7 @@
 
 package org.bbreak.excella.trans.processor;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.text.DateFormat;
 import java.util.List;
@@ -34,7 +34,8 @@ import org.bbreak.excella.trans.tag.sheet2java.entity.TestEntity1;
 import org.bbreak.excella.trans.tag.sheet2java.entity.TestEntity2;
 import org.bbreak.excella.trans.tag.sheet2sql.SheetToSqlExecuter;
 import org.bbreak.excella.trans.tag.sheet2sql.converter.DefaultSheetToSqlDataConverter;
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 /**
  * SheetToJava、SheetToSqlの疎通テストクラス<BR>
@@ -47,20 +48,12 @@ import org.junit.Test;
  */
 public class ConnectivityTest extends WorkbookTest {
 
-    /**
-     * コンストラクタ
-     * 
-     * @param version Excelファイルのバージョン
-     */
-    public ConnectivityTest( String version) {
-        super( version);
-    }
-
-    @Test
+    @ParameterizedTest
+    @CsvSource( WorkbookTest.VERSIONS)
     @SuppressWarnings( "unchecked")
-    public final void testConnectivity() throws Exception {
+    public final void testConnectivity( String version) throws Exception {
 
-        super.getWorkbook();
+        super.getWorkbook( version);
         String filePath = super.getFilepath();
         TransProcessor processor = new TransProcessor( filePath);
 

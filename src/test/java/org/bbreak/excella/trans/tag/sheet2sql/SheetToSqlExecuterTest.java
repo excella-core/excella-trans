@@ -20,10 +20,11 @@
 
 package org.bbreak.excella.trans.tag.sheet2sql;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +38,8 @@ import org.bbreak.excella.trans.WorkbookTest;
 import org.bbreak.excella.trans.tag.sheet2sql.converter.DefaultSheetToSqlDataConverter;
 import org.bbreak.excella.trans.tag.sheet2sql.model.SheetToSqlParseInfo;
 import org.bbreak.excella.trans.tag.sheet2sql.model.SheetToSqlSettingInfo;
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 /**
  * SheetToSqlExecuterテストクラス
@@ -46,24 +48,16 @@ import org.junit.Test;
  */
 public class SheetToSqlExecuterTest extends WorkbookTest {
 
-    /**
-     * コンストラクタ
-     * 
-     * @param version Excelファイルのバージョン
-     */
-    public SheetToSqlExecuterTest( String version) {
-        super( version);
-    }
-
-    @Test
+    @ParameterizedTest
+    @CsvSource( WorkbookTest.VERSIONS)
     @SuppressWarnings( "unchecked")
-    public final void testSheetToSqlExecuter() throws ParseException, java.text.ParseException {
+    public final void testSheetToSqlExecuter( String version) throws ParseException, java.text.ParseException, IOException {
 
-        Workbook workbook = getWorkbook();
+        Workbook workbook = getWorkbook( version);
         Sheet sheet = workbook.getSheetAt( 0);
         SheetToSqlExecuter executer = new SheetToSqlExecuter();
         
-        SheetData sheetData = new SheetData( "SheetToSql");
+        SheetData sheetData1 = new SheetData( "SheetToSql");
 
         List<SheetToSqlParseInfo> sheet2SqlData = new ArrayList<SheetToSqlParseInfo>();
         List<SheetToSqlSettingInfo> sheet2SqlSettingData = new ArrayList<SheetToSqlSettingInfo>();
@@ -111,8 +105,8 @@ public class SheetToSqlExecuterTest extends WorkbookTest {
         sheet2SqlSettingData.add( settingInfo2);
 
         // シートデータにつめる
-        sheetData.put( tagName, sheet2SqlData);
-        sheetData.put( settingTagName, sheet2SqlSettingData);
+        sheetData1.put( tagName, sheet2SqlData);
+        sheetData1.put( settingTagName, sheet2SqlSettingData);
 
         // シートパーサ
         SheetParser sheetParser = new SheetParser();
@@ -120,8 +114,8 @@ public class SheetToSqlExecuterTest extends WorkbookTest {
         sheetParser.addTagParser( new SheetToSqlSettingParser());
 
         // No.1 postParse実行
-        executer.postParse( sheet, sheetParser, sheetData);
-        List<String> results = ( List<String>) sheetData.get( tagName);
+        executer.postParse( sheet, sheetParser, sheetData1);
+        List<String> results = ( List<String>) sheetData1.get( tagName);
         String sql1 = "insert into test_table1 (col_char,columnName2) values ('String1',10);";
         String sql2 = "insert into test_table1 (col_char,columnName2) values ('String2',10);";
         String sql3 = "insert into test_table1 (col_char,columnName2) values ('String3',10);";
@@ -131,42 +125,27 @@ public class SheetToSqlExecuterTest extends WorkbookTest {
         assertEquals( sql3, results.get( 2));
 
         // No.2 SheetToSqlSettingInfoのデータが削除されていることを確認
-        assertNull( sheetData.get( settingTagName));
+        assertNull( sheetData1.get( settingTagName));
 
         // シートデータ作成
-        sheetData = new SheetData( "SheetToSql");
-        sheetData.put( tagName, sheet2SqlData);
-        sheetData.put( settingTagName, sheet2SqlSettingData);
+        SheetData sheetData2 = new SheetData( "SheetToSql");
+        sheetData2.put( tagName, sheet2SqlData);
+        sheetData2.put( settingTagName, sheet2SqlSettingData);
 
         // No.3 第一引数にnullを指定
-        try {
-            executer.postParse( null, sheetParser, sheetData);
-            fail( "NullPointerException expected, but no exception was thrown.");
-        } catch ( NullPointerException e) {
-            // 例外が発生
-        }
+        assertThrows( NullPointerException.class, () -> executer.postParse( null, sheetParser, sheetData2));
 
         // No.4 第二引数にnullを指定
-        try {
-            executer.postParse( sheet, null, sheetData);
-            fail( "NullPointerException expected, but no exception was thrown.");
-        } catch ( NullPointerException e) {
-            // 例外が発生
-        }
+        assertThrows( NullPointerException.class, () -> executer.postParse( sheet, null, sheetData2));
 
         // No.5 第三引数にnullを指定
-        try {
-            executer.postParse( sheet, sheetParser, null);
-            fail( "NullPointerException expected, but no exception was thrown.");
-        } catch ( NullPointerException e) {
-            // 例外が発生
-        }
+        assertThrows( NullPointerException.class, () -> executer.postParse( sheet, sheetParser, null));
 
         // No.6 使用しないタグパーサを追加
         sheetParser.addTagParser( new SheetToSqlParser( "@UnusedSheetToSql")); /* 使用しないタグパーサ */
-        executer.postParse( sheet, sheetParser, sheetData);
+        executer.postParse( sheet, sheetParser, sheetData2);
         results.clear();
-        results = ( List<String>) sheetData.get( tagName);
+        results = ( List<String>) sheetData2.get( tagName);
         assertEquals( 3, results.size());
         assertEquals( sql1, results.get( 0));
         assertEquals( sql2, results.get( 1));
@@ -181,17 +160,11 @@ public class SheetToSqlExecuterTest extends WorkbookTest {
         sheet2SqlData.add( parseInfo2);
 
         // シートデータ作成
-        sheetData = new SheetData( "SheetToSql");
-        sheetData.put( tagName, sheet2SqlData);
-        sheetData.put( settingTagName, sheet2SqlSettingData);
+        SheetData sheetData7 = new SheetData( "SheetToSql");
+        sheetData7.put( tagName, sheet2SqlData);
+        sheetData7.put( settingTagName, sheet2SqlSettingData);
 
-        try {
-            executer.postParse( sheet, sheetParser, sheetData);
-            fail( "ParseException expected, but no exception was thrown.");
-        } catch ( ParseException pe) {
-            // 例外が発生
-            System.out.println( "No.7:" + pe);
-        }
+        assertThrows( ParseException.class, () -> executer.postParse( sheet, sheetParser, sheetData7));
 
         // No.8 指定論理名行がnull行
         String sheetName2 = "testSheet (2)";
@@ -213,17 +186,11 @@ public class SheetToSqlExecuterTest extends WorkbookTest {
         sheet2SqlSettingData.add( settingInfo3);
 
         // シートデータ作成
-        sheetData = new SheetData( "SheetToSql");
-        sheetData.put( tagName, sheet2SqlData);
-        sheetData.put( settingTagName, sheet2SqlSettingData);
+        SheetData sheetData8 = new SheetData( "SheetToSql");
+        sheetData8.put( tagName, sheet2SqlData);
+        sheetData8.put( settingTagName, sheet2SqlSettingData);
 
-        try {
-            executer.postParse( sheet, sheetParser, sheetData);
-            fail( "ParseException expected, but no exception was thrown.");
-        } catch ( ParseException pe) {
-            // 例外が発生
-            System.out.println( "No.8:" + pe);
-        }
+        assertThrows( ParseException.class, () -> executer.postParse( sheet, sheetParser, sheetData8));
 
         // No.9 指定データ開始行がnull行
         SheetToSqlParseInfo parseInfo4 = new SheetToSqlParseInfo();
@@ -235,13 +202,13 @@ public class SheetToSqlExecuterTest extends WorkbookTest {
         sheet2SqlData.add( parseInfo4);
 
         // シートデータ作成
-        sheetData = new SheetData( "SheetToSql");
-        sheetData.put( tagName, sheet2SqlData);
-        sheetData.put( settingTagName, sheet2SqlSettingData);
+        SheetData sheetData9 = new SheetData( "SheetToSql");
+        sheetData9.put( tagName, sheet2SqlData);
+        sheetData9.put( settingTagName, sheet2SqlSettingData);
 
-        executer.postParse( sheet, sheetParser, sheetData);
+        executer.postParse( sheet, sheetParser, sheetData9);
         results.clear();
-        results = ( List<String>) sheetData.get( tagName);
+        results = ( List<String>) sheetData9.get( tagName);
         assertEquals( 1, results.size());
         sql1 = "insert into test_table1 (columnName1) values ('String2');";
         assertEquals( sql1, results.get( 0));
@@ -256,13 +223,13 @@ public class SheetToSqlExecuterTest extends WorkbookTest {
         sheet2SqlData.add( parseInfo5);
 
         // シートデータ作成
-        sheetData = new SheetData( "SheetToSql");
-        sheetData.put( tagName, sheet2SqlData);
-        sheetData.put( settingTagName, sheet2SqlSettingData);
+        SheetData sheetData10 = new SheetData( "SheetToSql");
+        sheetData10.put( tagName, sheet2SqlData);
+        sheetData10.put( settingTagName, sheet2SqlSettingData);
 
-        executer.postParse( sheet, sheetParser, sheetData);
+        executer.postParse( sheet, sheetParser, sheetData10);
         results.clear();
-        results = ( List<String>) sheetData.get( tagName);
+        results = ( List<String>) sheetData10.get( tagName);
         assertEquals( 2, results.size());
         sql1 = "insert into test_table1 (columnName1) values ('String1');";
         sql2 = "insert into test_table1 (columnName1) values ('String2');";
@@ -289,13 +256,13 @@ public class SheetToSqlExecuterTest extends WorkbookTest {
         sheet2SqlSettingData.add( settingInfo4);
 
         // シートデータ作成
-        sheetData = new SheetData( "SheetToSql");
-        sheetData.put( tagName, sheet2SqlData);
-        sheetData.put( settingTagName, sheet2SqlSettingData);
+        SheetData sheetData11 = new SheetData( "SheetToSql");
+        sheetData11.put( tagName, sheet2SqlData);
+        sheetData11.put( settingTagName, sheet2SqlSettingData);
 
-        executer.postParse( sheet, sheetParser, sheetData);
+        executer.postParse( sheet, sheetParser, sheetData11);
         results.clear();
-        results = ( List<String>) sheetData.get( tagName);
+        results = ( List<String>) sheetData11.get( tagName);
         assertEquals( 3, results.size());
         sql1 = "insert into test_table1 (columnName1) values ('String1');";
         sql2 = "insert into test_table1 (columnName1) values (null);";
@@ -324,19 +291,15 @@ public class SheetToSqlExecuterTest extends WorkbookTest {
         sheet2SqlSettingData.add( settingInfo5);
 
         // シートデータ作成
-        sheetData = new SheetData( "SheetToSql");
-        sheetData.put( tagName, sheet2SqlData);
-        sheetData.put( settingTagName, sheet2SqlSettingData);
+        SheetData sheetData12 = new SheetData( "SheetToSql");
+        sheetData12.put( tagName, sheet2SqlData);
+        sheetData12.put( settingTagName, sheet2SqlSettingData);
 
-        try {
-            executer.postParse( sheet, sheetParser, sheetData);
-            fail( "ParseException expected, but no exception was thrown.");
-        } catch ( ParseException pe) {
-            Cell cell = pe.getCell();
-            assertEquals( 0, cell.getRow().getRowNum());
-            assertEquals( 0, cell.getColumnIndex());
-            System.out.println( "No.12:" + pe);
-        }
+        ParseException pe = assertThrows( ParseException.class, () -> executer.postParse( sheet, sheetParser, sheetData12));
+        Cell cell = pe.getCell();
+        assertEquals( 0, cell.getRow().getRowNum());
+        assertEquals( 0, cell.getColumnIndex());
+        System.out.println( "No.12:" + pe);
 
         // No.13 シート名がnull
         String sheetName5 = "testSheet (5)";
@@ -358,16 +321,11 @@ public class SheetToSqlExecuterTest extends WorkbookTest {
         sheet2SqlSettingData.add( settingInfo6);
 
         // シートデータ作成
-        sheetData = new SheetData( "SheetToSql");
-        sheetData.put( tagName, sheet2SqlData);
-        sheetData.put( settingTagName, sheet2SqlSettingData);
+        SheetData sheetData13 = new SheetData( "SheetToSql");
+        sheetData13.put( tagName, sheet2SqlData);
+        sheetData13.put( settingTagName, sheet2SqlSettingData);
 
-        try {
-            executer.postParse( sheet, sheetParser, sheetData);
-            fail( "NullPointerException expected, but no exception was thrown.");
-        } catch ( NullPointerException e) {
-            // 例外が発生
-        }
+        assertThrows( NullPointerException.class, () -> executer.postParse( sheet, sheetParser, sheetData13));
      
         // No.14 論理名行Noがnull
         SheetToSqlParseInfo parseInfo9 = new SheetToSqlParseInfo();
@@ -379,16 +337,11 @@ public class SheetToSqlExecuterTest extends WorkbookTest {
         sheet2SqlData.add( parseInfo9);
 
         // シートデータ作成
-        sheetData = new SheetData( "SheetToSql");
-        sheetData.put( tagName, sheet2SqlData);
-        sheetData.put( settingTagName, sheet2SqlSettingData);
+        SheetData sheetData14 = new SheetData( "SheetToSql");
+        sheetData14.put( tagName, sheet2SqlData);
+        sheetData14.put( settingTagName, sheet2SqlSettingData);
 
-        try {
-            executer.postParse( sheet, sheetParser, sheetData);
-            fail( "NullPointerException expected, but no exception was thrown.");
-        } catch ( NullPointerException e) {
-            // 例外が発生
-        }
+        assertThrows( NullPointerException.class, () -> executer.postParse( sheet, sheetParser, sheetData14));
 
         // No.15 データ開始行Noがnull
         SheetToSqlParseInfo parseInfo10 = new SheetToSqlParseInfo();
@@ -400,16 +353,11 @@ public class SheetToSqlExecuterTest extends WorkbookTest {
         sheet2SqlData.add( parseInfo10);
 
         // シートデータ作成
-        sheetData = new SheetData( "SheetToSql");
-        sheetData.put( tagName, sheet2SqlData);
-        sheetData.put( settingTagName, sheet2SqlSettingData);
+        SheetData sheetData15 = new SheetData( "SheetToSql");
+        sheetData15.put( tagName, sheet2SqlData);
+        sheetData15.put( settingTagName, sheet2SqlSettingData);
 
-        try {
-            executer.postParse( sheet, sheetParser, sheetData);
-            fail( "NullPointerException expected, but no exception was thrown.");
-        } catch ( NullPointerException e) {
-            // 例外が発生
-        }
+        assertThrows( NullPointerException.class, () -> executer.postParse( sheet, sheetParser, sheetData15));
 
         // No.16 Settingタグ名がnull
         SheetToSqlParseInfo parseInfo11 = new SheetToSqlParseInfo();
@@ -421,28 +369,23 @@ public class SheetToSqlExecuterTest extends WorkbookTest {
         sheet2SqlData.add( parseInfo11);
 
         // シートデータ作成
-        sheetData = new SheetData( "SheetToSql");
-        sheetData.put( tagName, sheet2SqlData);
-        sheetData.put( settingTagName, sheet2SqlSettingData);
+        SheetData sheetData16 = new SheetData( "SheetToSql");
+        sheetData16.put( tagName, sheet2SqlData);
+        sheetData16.put( settingTagName, sheet2SqlSettingData);
 
-        try {
-            executer.postParse( sheet, sheetParser, sheetData);
-            fail( "NullPointerException expected, but no exception was thrown.");
-        } catch ( NullPointerException e) {
-            // 例外が発生
-        }
+        assertThrows( NullPointerException.class, () -> executer.postParse( sheet, sheetParser, sheetData16));
         
         // No.17 SheetToSqlParseInfoが設定されていない
         sheet2SqlData.clear();
         
         // シートデータ作成
-        sheetData = new SheetData( "SheetToSql");
-        sheetData.put( tagName, sheet2SqlData);
-        sheetData.put( settingTagName, sheet2SqlSettingData);
+        SheetData sheetData17 = new SheetData( "SheetToSql");
+        sheetData17.put( tagName, sheet2SqlData);
+        sheetData17.put( settingTagName, sheet2SqlSettingData);
 
-        executer.postParse( sheet, sheetParser, sheetData);
+        executer.postParse( sheet, sheetParser, sheetData17);
         results.clear();
-        results = ( List<String>) sheetData.get( tagName);
+        results = ( List<String>) sheetData17.get( tagName);
         assertEquals( 0, results.size());
         
         // No.18 SheetToSqlSettingInfoが設定されていない
@@ -457,13 +400,13 @@ public class SheetToSqlExecuterTest extends WorkbookTest {
         sheet2SqlSettingData.clear();
         
         // シートデータ作成
-        sheetData = new SheetData( "SheetToSql");
-        sheetData.put( tagName, sheet2SqlData);
-        sheetData.put( settingTagName, sheet2SqlSettingData);
+        SheetData sheetData18 = new SheetData( "SheetToSql");
+        sheetData18.put( tagName, sheet2SqlData);
+        sheetData18.put( settingTagName, sheet2SqlSettingData);
 
-        executer.postParse( sheet, sheetParser, sheetData);
+        executer.postParse( sheet, sheetParser, sheetData18);
         results.clear();
-        results = ( List<String>) sheetData.get( tagName);
+        results = ( List<String>) sheetData18.get( tagName);
         assertEquals( 0, results.size());
         
         // No.19 重複不可プロパティ
@@ -503,13 +446,13 @@ public class SheetToSqlExecuterTest extends WorkbookTest {
         sheet2SqlSettingData.add( settingInfo9);
 
         // シートデータ作成
-        sheetData = new SheetData( "SheetToSql");
-        sheetData.put( tagName, sheet2SqlData);
-        sheetData.put( settingTagName, sheet2SqlSettingData);
+        SheetData sheetData19 = new SheetData( "SheetToSql");
+        sheetData19.put( tagName, sheet2SqlData);
+        sheetData19.put( settingTagName, sheet2SqlSettingData);
         
-        executer.postParse( sheet, sheetParser, sheetData);
+        executer.postParse( sheet, sheetParser, sheetData19);
         results.clear();
-        results = ( List<String>) sheetData.get( tagName);
+        results = ( List<String>) sheetData19.get( tagName);
         assertEquals( 3, results.size());
         sql1 = "insert into test_table1 (columnName1,columnName2,columnName3) values ('String1',100,'2009-01-01');";
         sql2 = "insert into test_table1 (columnName1,columnName2,columnName3) values ('String2',null,'2009-03-01');";
@@ -548,13 +491,13 @@ public class SheetToSqlExecuterTest extends WorkbookTest {
         sheet2SqlSettingData.add( settingInfo12);
     
         // シートデータ作成
-        sheetData = new SheetData( "SheetToSql");
-        sheetData.put( tagName, sheet2SqlData);
-        sheetData.put( settingTagName, sheet2SqlSettingData);
+        SheetData sheetData20 = new SheetData( "SheetToSql");
+        sheetData20.put( tagName, sheet2SqlData);
+        sheetData20.put( settingTagName, sheet2SqlSettingData);
         
-        executer.postParse( sheet, sheetParser, sheetData);
+        executer.postParse( sheet, sheetParser, sheetData20);
         results.clear();
-        results = ( List<String>) sheetData.get( tagName);
+        results = ( List<String>) sheetData20.get( tagName);
         assertEquals( 7, results.size());
         sql1 = "insert into test_table1 (columnName1,columnName2,columnName3) values ('String1',100,'2009-01-01');";
         sql2 = "insert into test_table1 (columnName1,columnName2,columnName3) values ('String2',null,'2009-03-01');";

@@ -20,10 +20,11 @@
 
 package org.bbreak.excella.trans.tag.sheet2java;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +40,8 @@ import org.bbreak.excella.trans.tag.sheet2java.entity.TestEntity1;
 import org.bbreak.excella.trans.tag.sheet2java.entity.TestEntity2;
 import org.bbreak.excella.trans.tag.sheet2java.model.SheetToJavaParseInfo;
 import org.bbreak.excella.trans.tag.sheet2java.model.SheetToJavaSettingInfo;
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 /**
  * SheetToJavaExecuterテストクラス
@@ -48,23 +50,14 @@ import org.junit.Test;
  */
 public class SheetToJavaExecuterTest extends WorkbookTest {
 
-    /**
-     * コンストラクタ
-     * 
-     * @param version Excelファイルのバージョン
-     */
-    public SheetToJavaExecuterTest( String version) {
-        super( version);
-    }
-
-    @Test
+    @ParameterizedTest
+    @CsvSource( WorkbookTest.VERSIONS)
     @SuppressWarnings( "unchecked")
-    public final void testSheetToJavaExecuter() throws ParseException, java.text.ParseException {
+    public final void testSheetToJavaExecuter( String version) throws ParseException, java.text.ParseException, IOException {
 
-        Workbook workbook = getWorkbook();
+        Workbook workbook = getWorkbook( version);
         Sheet sheet = workbook.getSheetAt( 0);
         SheetToJavaExecuter executer = new SheetToJavaExecuter();
-        SheetData sheetData = new SheetData( "SheetToJava");
 
         List<SheetToJavaParseInfo> sheet2JavaData = new ArrayList<SheetToJavaParseInfo>();
         List<SheetToJavaSettingInfo> sheet2JavaSettingData = new ArrayList<SheetToJavaSettingInfo>();
@@ -99,8 +92,9 @@ public class SheetToJavaExecuterTest extends WorkbookTest {
         sheet2JavaSettingData.add( settingInfo2);
 
         // シートデータにつめる
-        sheetData.put( tagName, sheet2JavaData);
-        sheetData.put( settingTagName, sheet2JavaSettingData);
+        SheetData sheetData1 = new SheetData( "SheetToJava");
+        sheetData1.put( tagName, sheet2JavaData);
+        sheetData1.put( settingTagName, sheet2JavaSettingData);
 
         // シートパーサ
         SheetParser sheetParser = new SheetParser();
@@ -108,8 +102,8 @@ public class SheetToJavaExecuterTest extends WorkbookTest {
         sheetParser.addTagParser( new SheetToJavaSettingParser());
 
         // No.1 postParse実行
-        executer.postParse( sheet, sheetParser, sheetData);
-        List<Object> results = ( List<Object>) sheetData.get( tagName);
+        executer.postParse( sheet, sheetParser, sheetData1);
+        List<Object> results = ( List<Object>) sheetData1.get( tagName);
         assertEquals( 3, results.size());
         assertEquals( "String1", (( TestEntity1) results.get( 0)).getPropertyStr1());
         assertEquals( "String2", (( TestEntity1) results.get( 1)).getPropertyStr1());
@@ -119,42 +113,27 @@ public class SheetToJavaExecuterTest extends WorkbookTest {
         assertEquals( new Integer( 10), (( TestEntity1) results.get( 2)).getPropertyInt1());
 
         // No.2 SheetToJavaSettingInfoのデータが削除されていることを確認
-        assertNull( sheetData.get( settingTagName));
+        assertNull( sheetData1.get( settingTagName));
 
         // シートデータ作成
-        sheetData = new SheetData( "SheetToJava");
-        sheetData.put( tagName, sheet2JavaData);
-        sheetData.put( settingTagName, sheet2JavaSettingData);
+        SheetData sheetData3 = new SheetData( "SheetToJava");
+        sheetData3.put( tagName, sheet2JavaData);
+        sheetData3.put( settingTagName, sheet2JavaSettingData);
 
         // No.3 第一引数にnullを指定
-        try {
-            executer.postParse( null, sheetParser, sheetData);
-            fail( "NullPointerException expected, but no exception was thrown.");
-        } catch ( NullPointerException e) {
-            // 例外が発生
-        }
+        assertThrows( NullPointerException.class, () -> executer.postParse( null, sheetParser, sheetData3));
 
         // No.4 第二引数にnullを指定
-        try {
-            executer.postParse( sheet, null, sheetData);
-            fail( "NullPointerException expected, but no exception was thrown.");
-        } catch ( NullPointerException e) {
-            // 例外が発生
-        }
+        assertThrows( NullPointerException.class, () -> executer.postParse( sheet, null, sheetData3));
 
         // No.5 第三引数にnullを指定
-        try {
-            executer.postParse( sheet, sheetParser, null);
-            fail( "NullPointerException expected, but no exception was thrown.");
-        } catch ( NullPointerException e) {
-            // 例外が発生
-        }
+        assertThrows( NullPointerException.class, () -> executer.postParse( sheet, sheetParser, null));
 
         // No.6 使用しないタグパーサを追加
         sheetParser.addTagParser( new SheetToJavaParser( "@UnusedSheetToJava")); /* 使用しないタグパーサ */
-        executer.postParse( sheet, sheetParser, sheetData);
+        executer.postParse( sheet, sheetParser, sheetData3);
         results.clear();
-        results = ( List<Object>) sheetData.get( tagName);
+        results = ( List<Object>) sheetData3.get( tagName);
         assertEquals( 3, results.size());
         assertEquals( "String1", (( TestEntity1) results.get( 0)).getPropertyStr1());
         assertEquals( "String2", (( TestEntity1) results.get( 1)).getPropertyStr1());
@@ -172,17 +151,11 @@ public class SheetToJavaExecuterTest extends WorkbookTest {
         sheet2JavaData.add( parseInfo2);
 
         // シートデータ作成
-        sheetData = new SheetData( "SheetToJava");
-        sheetData.put( tagName, sheet2JavaData);
-        sheetData.put( settingTagName, sheet2JavaSettingData);
+        SheetData sheetData7 = new SheetData( "SheetToJava");
+        sheetData7.put( tagName, sheet2JavaData);
+        sheetData7.put( settingTagName, sheet2JavaSettingData);
 
-        try {
-            executer.postParse( sheet, sheetParser, sheetData);
-            fail( "ParseException expected, but no exception was thrown.");
-        } catch ( ParseException pe) {
-            // 例外が発生
-            System.out.println( "No.7:" + pe);
-        }
+        assertThrows( ParseException.class, () -> executer.postParse( sheet, sheetParser, sheetData7));
 
         // No.8 指定論理名行がnull行
         String sheetName2 = "testSheet (2)";
@@ -203,17 +176,11 @@ public class SheetToJavaExecuterTest extends WorkbookTest {
         sheet2JavaSettingData.add( settingInfo3);
 
         // シートデータ作成
-        sheetData = new SheetData( "SheetToJava");
-        sheetData.put( tagName, sheet2JavaData);
-        sheetData.put( settingTagName, sheet2JavaSettingData);
+        SheetData sheetData8 = new SheetData( "SheetToJava");
+        sheetData8.put( tagName, sheet2JavaData);
+        sheetData8.put( settingTagName, sheet2JavaSettingData);
 
-        try {
-            executer.postParse( sheet, sheetParser, sheetData);
-            fail( "ParseException expected, but no exception was thrown.");
-        } catch ( ParseException pe) {
-            // 例外が発生
-            System.out.println( "No.8:" + pe);
-        }
+        assertThrows( ParseException.class, () -> executer.postParse( sheet, sheetParser, sheetData8));
 
         // No.9 指定データ開始行がnull行
         SheetToJavaParseInfo parseInfo4 = new SheetToJavaParseInfo();
@@ -225,13 +192,13 @@ public class SheetToJavaExecuterTest extends WorkbookTest {
         sheet2JavaData.add( parseInfo4);
 
         // シートデータ作成
-        sheetData = new SheetData( "SheetToJava");
-        sheetData.put( tagName, sheet2JavaData);
-        sheetData.put( settingTagName, sheet2JavaSettingData);
+        SheetData sheetData9 = new SheetData( "SheetToJava");
+        sheetData9.put( tagName, sheet2JavaData);
+        sheetData9.put( settingTagName, sheet2JavaSettingData);
 
-        executer.postParse( sheet, sheetParser, sheetData);
+        executer.postParse( sheet, sheetParser, sheetData9);
         results.clear();
-        results = ( List<Object>) sheetData.get( tagName);
+        results = ( List<Object>) sheetData9.get( tagName);
         assertEquals( 1, results.size());
         assertEquals( new Integer( 20), (( TestEntity1) results.get( 0)).getPropertyInt1());
 
@@ -245,13 +212,13 @@ public class SheetToJavaExecuterTest extends WorkbookTest {
         sheet2JavaData.add( parseInfo5);
 
         // シートデータ作成
-        sheetData = new SheetData( "SheetToJava");
-        sheetData.put( tagName, sheet2JavaData);
-        sheetData.put( settingTagName, sheet2JavaSettingData);
+        SheetData sheetData10 = new SheetData( "SheetToJava");
+        sheetData10.put( tagName, sheet2JavaData);
+        sheetData10.put( settingTagName, sheet2JavaSettingData);
 
-        executer.postParse( sheet, sheetParser, sheetData);
+        executer.postParse( sheet, sheetParser, sheetData10);
         results.clear();
-        results = ( List<Object>) sheetData.get( tagName);
+        results = ( List<Object>) sheetData10.get( tagName);
         assertEquals( 2, results.size());
         assertEquals( new Integer( 10), (( TestEntity1) results.get( 0)).getPropertyInt1());
         assertEquals( new Integer( 20), (( TestEntity1) results.get( 1)).getPropertyInt1());
@@ -275,13 +242,13 @@ public class SheetToJavaExecuterTest extends WorkbookTest {
         sheet2JavaSettingData.add( settingInfo4);
 
         // シートデータ作成
-        sheetData = new SheetData( "SheetToJava");
-        sheetData.put( tagName, sheet2JavaData);
-        sheetData.put( settingTagName, sheet2JavaSettingData);
+        SheetData sheetData11 = new SheetData( "SheetToJava");
+        sheetData11.put( tagName, sheet2JavaData);
+        sheetData11.put( settingTagName, sheet2JavaSettingData);
 
-        executer.postParse( sheet, sheetParser, sheetData);
+        executer.postParse( sheet, sheetParser, sheetData11);
         results.clear();
-        results = ( List<Object>) sheetData.get( tagName);
+        results = ( List<Object>) sheetData11.get( tagName);
         assertEquals( 3, results.size());
         assertEquals( DateFormat.getDateInstance().parse( "2009/1/1"), (( TestEntity1) results.get( 0)).getPropertyDate1());
         assertNull( (( TestEntity1) results.get( 1)).getPropertyDate1());
@@ -306,19 +273,15 @@ public class SheetToJavaExecuterTest extends WorkbookTest {
         sheet2JavaSettingData.add( settingInfo5);
 
         // シートデータ作成
-        sheetData = new SheetData( "SheetToJava");
-        sheetData.put( tagName, sheet2JavaData);
-        sheetData.put( settingTagName, sheet2JavaSettingData);
+        SheetData sheetData12 = new SheetData( "SheetToJava");
+        sheetData12.put( tagName, sheet2JavaData);
+        sheetData12.put( settingTagName, sheet2JavaSettingData);
 
-        try {
-            executer.postParse( sheet, sheetParser, sheetData);
-            fail( "ParseException expected, but no exception was thrown.");
-        } catch ( ParseException pe) {
-            Cell cell = pe.getCell();
-            assertEquals( 0, cell.getRow().getRowNum());
-            assertEquals( 0, cell.getColumnIndex());
-            System.out.println( "No.12:" + pe);
-        }
+        ParseException pe = assertThrows( ParseException.class, () -> executer.postParse( sheet, sheetParser, sheetData12));
+        Cell cell = pe.getCell();
+        assertEquals( 0, cell.getRow().getRowNum());
+        assertEquals( 0, cell.getColumnIndex());
+        System.out.println( "No.12:" + pe);
 
         // No.13 シート名がnull
         String sheetName5 = "testSheet (5)";
@@ -339,16 +302,11 @@ public class SheetToJavaExecuterTest extends WorkbookTest {
         sheet2JavaSettingData.add( settingInfo6);
 
         // シートデータ作成
-        sheetData = new SheetData( "SheetToJava");
-        sheetData.put( tagName, sheet2JavaData);
-        sheetData.put( settingTagName, sheet2JavaSettingData);
+        SheetData sheetData13 = new SheetData( "SheetToJava");
+        sheetData13.put( tagName, sheet2JavaData);
+        sheetData13.put( settingTagName, sheet2JavaSettingData);
 
-        try {
-            executer.postParse( sheet, sheetParser, sheetData);
-            fail( "NullPointerException expected, but no exception was thrown.");
-        } catch ( NullPointerException e) {
-            // 例外が発生
-        }
+        assertThrows( NullPointerException.class, () -> executer.postParse( sheet, sheetParser, sheetData13));
 
         // No.14 論理名行Noがnull
         SheetToJavaParseInfo parseInfo9 = new SheetToJavaParseInfo();
@@ -360,16 +318,11 @@ public class SheetToJavaExecuterTest extends WorkbookTest {
         sheet2JavaData.add( parseInfo9);
 
         // シートデータ作成
-        sheetData = new SheetData( "SheetToJava");
-        sheetData.put( tagName, sheet2JavaData);
-        sheetData.put( settingTagName, sheet2JavaSettingData);
+        SheetData sheetData14 = new SheetData( "SheetToJava");
+        sheetData14.put( tagName, sheet2JavaData);
+        sheetData14.put( settingTagName, sheet2JavaSettingData);
 
-        try {
-            executer.postParse( sheet, sheetParser, sheetData);
-            fail( "NullPointerException expected, but no exception was thrown.");
-        } catch ( NullPointerException e) {
-            // 例外が発生
-        }
+        assertThrows( NullPointerException.class, () -> executer.postParse( sheet, sheetParser, sheetData14));
 
         // No.15 データ開始行Noがnull
         SheetToJavaParseInfo parseInfo10 = new SheetToJavaParseInfo();
@@ -381,16 +334,11 @@ public class SheetToJavaExecuterTest extends WorkbookTest {
         sheet2JavaData.add( parseInfo10);
 
         // シートデータ作成
-        sheetData = new SheetData( "SheetToJava");
-        sheetData.put( tagName, sheet2JavaData);
-        sheetData.put( settingTagName, sheet2JavaSettingData);
+        SheetData sheetData15 = new SheetData( "SheetToJava");
+        sheetData15.put( tagName, sheet2JavaData);
+        sheetData15.put( settingTagName, sheet2JavaSettingData);
 
-        try {
-            executer.postParse( sheet, sheetParser, sheetData);
-            fail( "NullPointerException expected, but no exception was thrown.");
-        } catch ( NullPointerException e) {
-            // 例外が発生
-        }
+        assertThrows( NullPointerException.class, () -> executer.postParse( sheet, sheetParser, sheetData15));
 
         // No.16 Settingタグ名がnull
         SheetToJavaParseInfo parseInfo11 = new SheetToJavaParseInfo();
@@ -402,28 +350,23 @@ public class SheetToJavaExecuterTest extends WorkbookTest {
         sheet2JavaData.add( parseInfo11);
 
         // シートデータ作成
-        sheetData = new SheetData( "SheetToJava");
-        sheetData.put( tagName, sheet2JavaData);
-        sheetData.put( settingTagName, sheet2JavaSettingData);
+        SheetData sheetData16 = new SheetData( "SheetToJava");
+        sheetData16.put( tagName, sheet2JavaData);
+        sheetData16.put( settingTagName, sheet2JavaSettingData);
 
-        try {
-            executer.postParse( sheet, sheetParser, sheetData);
-            fail( "NullPointerException expected, but no exception was thrown.");
-        } catch ( NullPointerException e) {
-            // 例外が発生
-        }
+        assertThrows( NullPointerException.class, () -> executer.postParse( sheet, sheetParser, sheetData16));
 
         // No.17 SheetToJavaParseInfoが設定されていない
         sheet2JavaData.clear();
 
         // シートデータ作成
-        sheetData = new SheetData( "SheetToJava");
-        sheetData.put( tagName, sheet2JavaData);
-        sheetData.put( settingTagName, sheet2JavaSettingData);
+        SheetData sheetData17 = new SheetData( "SheetToJava");
+        sheetData17.put( tagName, sheet2JavaData);
+        sheetData17.put( settingTagName, sheet2JavaSettingData);
 
-        executer.postParse( sheet, sheetParser, sheetData);
+        executer.postParse( sheet, sheetParser, sheetData17);
         results.clear();
-        results = ( List<Object>) sheetData.get( tagName);
+        results = ( List<Object>) sheetData17.get( tagName);
         assertEquals( 0, results.size());
 
         // No.18 SheetToJavaSettingInfoが設定されていない
@@ -438,13 +381,13 @@ public class SheetToJavaExecuterTest extends WorkbookTest {
         sheet2JavaSettingData.clear();
 
         // シートデータ作成
-        sheetData = new SheetData( "SheetToJava");
-        sheetData.put( tagName, sheet2JavaData);
-        sheetData.put( settingTagName, sheet2JavaSettingData);
+        SheetData sheetData18 = new SheetData( "SheetToJava");
+        sheetData18.put( tagName, sheet2JavaData);
+        sheetData18.put( settingTagName, sheet2JavaSettingData);
 
-        executer.postParse( sheet, sheetParser, sheetData);
+        executer.postParse( sheet, sheetParser, sheetData18);
         results.clear();
-        results = ( List<Object>) sheetData.get( tagName);
+        results = ( List<Object>) sheetData18.get( tagName);
         assertEquals( 0, results.size());
 
         // No.19 重複不可プロパティ
@@ -482,13 +425,13 @@ public class SheetToJavaExecuterTest extends WorkbookTest {
         sheet2JavaSettingData.add( settingInfo9);
 
         // シートデータ作成
-        sheetData = new SheetData( "SheetToJava");
-        sheetData.put( tagName, sheet2JavaData);
-        sheetData.put( settingTagName, sheet2JavaSettingData);
+        SheetData sheetData19 = new SheetData( "SheetToJava");
+        sheetData19.put( tagName, sheet2JavaData);
+        sheetData19.put( settingTagName, sheet2JavaSettingData);
 
-        executer.postParse( sheet, sheetParser, sheetData);
+        executer.postParse( sheet, sheetParser, sheetData19);
         results.clear();
-        results = ( List<Object>) sheetData.get( tagName);
+        results = ( List<Object>) sheetData19.get( tagName);
         assertEquals( 3, results.size());
         assertEquals( "String1", (( TestEntity1) results.get( 0)).getPropertyStr1());
         assertEquals( "String2", (( TestEntity1) results.get( 1)).getPropertyStr1());
@@ -527,13 +470,13 @@ public class SheetToJavaExecuterTest extends WorkbookTest {
         sheet2JavaSettingData.add( settingInfo12);
 
         // シートデータ作成
-        sheetData = new SheetData( "SheetToJava");
-        sheetData.put( tagName, sheet2JavaData);
-        sheetData.put( settingTagName, sheet2JavaSettingData);
+        SheetData sheetData20 = new SheetData( "SheetToJava");
+        sheetData20.put( tagName, sheet2JavaData);
+        sheetData20.put( settingTagName, sheet2JavaSettingData);
 
-        executer.postParse( sheet, sheetParser, sheetData);
+        executer.postParse( sheet, sheetParser, sheetData20);
         results.clear();
-        results = ( List<Object>) sheetData.get( tagName);
+        results = ( List<Object>) sheetData20.get( tagName);
         assertEquals( 7, results.size());
         assertEquals( "String1", (( TestEntity1) results.get( 0)).getPropertyStr1());
         assertEquals( "String2", (( TestEntity1) results.get( 1)).getPropertyStr1());
@@ -588,13 +531,13 @@ public class SheetToJavaExecuterTest extends WorkbookTest {
         sheet2JavaSettingData.add( settingInfo14);
 
         // シートデータ作成
-        sheetData = new SheetData( "SheetToJava");
-        sheetData.put( tagName, sheet2JavaData);
-        sheetData.put( settingTagName, sheet2JavaSettingData);
+        SheetData sheetData21 = new SheetData( "SheetToJava");
+        sheetData21.put( tagName, sheet2JavaData);
+        sheetData21.put( settingTagName, sheet2JavaSettingData);
 
-        executer.postParse( sheet, sheetParser, sheetData);
+        executer.postParse( sheet, sheetParser, sheetData21);
         results.clear();
-        results = ( List<Object>) sheetData.get( tagName);
+        results = ( List<Object>) sheetData21.get( tagName);
         assertEquals( 3, results.size());
         assertEquals( "String1", (( TestEntity1) results.get( 0)).getPropertyStr1());
         assertEquals( "String2", (( TestEntity1) results.get( 1)).getPropertyStr1());
@@ -614,13 +557,13 @@ public class SheetToJavaExecuterTest extends WorkbookTest {
         sheet2JavaSettingData.add( settingInfo15);
 
         // シートデータ作成
-        sheetData = new SheetData( "SheetToJava");
-        sheetData.put( tagName, sheet2JavaData);
-        sheetData.put( settingTagName, sheet2JavaSettingData);
+        SheetData sheetData22 = new SheetData( "SheetToJava");
+        sheetData22.put( tagName, sheet2JavaData);
+        sheetData22.put( settingTagName, sheet2JavaSettingData);
 
-        executer.postParse( sheet, sheetParser, sheetData);
+        executer.postParse( sheet, sheetParser, sheetData22);
         results.clear();
-        results = ( List<Object>) sheetData.get( tagName);
+        results = ( List<Object>) sheetData22.get( tagName);
         assertEquals( 3, results.size());
         assertEquals( "String1", (( TestEntity1) results.get( 0)).getPropertyStr1());
         assertEquals( "String2", (( TestEntity1) results.get( 1)).getPropertyStr1());
@@ -636,13 +579,13 @@ public class SheetToJavaExecuterTest extends WorkbookTest {
         executer.clearPropertyParsers();
 
         // シートデータ作成
-        sheetData = new SheetData( "SheetToJava");
-        sheetData.put( tagName, sheet2JavaData);
-        sheetData.put( settingTagName, sheet2JavaSettingData);
+        SheetData sheetData23 = new SheetData( "SheetToJava");
+        sheetData23.put( tagName, sheet2JavaData);
+        sheetData23.put( settingTagName, sheet2JavaSettingData);
 
-        executer.postParse( sheet, sheetParser, sheetData);
+        executer.postParse( sheet, sheetParser, sheetData23);
         results.clear();
-        results = ( List<Object>) sheetData.get( tagName);
+        results = ( List<Object>) sheetData23.get( tagName);
         assertEquals( 3, results.size());
         assertEquals( "String1", (( TestEntity1) results.get( 0)).getPropertyStr1());
         assertEquals( "String2", (( TestEntity1) results.get( 1)).getPropertyStr1());

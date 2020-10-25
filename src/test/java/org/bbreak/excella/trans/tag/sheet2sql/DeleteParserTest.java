@@ -20,8 +20,9 @@
 
 package org.bbreak.excella.trans.tag.sheet2sql;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.apache.poi.ss.usermodel.Cell;
@@ -29,7 +30,8 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.bbreak.excella.core.exception.ParseException;
 import org.bbreak.excella.trans.WorkbookTest;
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 /**
  * DeleteParserテストクラス
@@ -38,18 +40,10 @@ import org.junit.Test;
  */
 public class DeleteParserTest extends WorkbookTest {
 
-    /**
-     * コンストラクタ
-     * 
-     * @param version Excelファイルのバージョン
-     */
-    public DeleteParserTest( String version) {
-        super( version);
-    }
-
-    @Test
-    public final void testDeleteParser() throws ParseException {
-        Workbook workbook = getWorkbook();
+    @ParameterizedTest
+    @CsvSource( WorkbookTest.VERSIONS)
+    public final void testDeleteParser( String version) throws ParseException, IOException {
+        Workbook workbook = getWorkbook( version);
         Sheet sheet = workbook.getSheetAt( 0);
         DeleteParser deleteParser = new DeleteParser( "@Delete");
         Cell tagCell = null;

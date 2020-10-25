@@ -20,12 +20,13 @@
 
 package org.bbreak.excella.trans.tag.sheet2java;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.apache.poi.ss.usermodel.Cell;
@@ -36,7 +37,8 @@ import org.bbreak.excella.trans.WorkbookTest;
 import org.bbreak.excella.trans.tag.sheet2java.entity.TestEntity1;
 import org.bbreak.excella.trans.tag.sheet2java.entity.TestEntity2;
 import org.bbreak.excella.trans.tag.sheet2java.model.SheetToJavaSettingInfo;
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 /**
  * SheetToJavaSettingParserテストクラス
@@ -45,18 +47,10 @@ import org.junit.Test;
  */
 public class SheetToJavaSettingParserTest extends WorkbookTest {
 
-    /**
-     * コンストラクタ
-     * 
-     * @param version Excelファイルのバージョン
-     */
-    public SheetToJavaSettingParserTest( String version) {
-        super( version);
-    }
-
-    @Test
-    public final void testSheetToJavaSettingParser() throws ParseException {
-        Workbook workbook = getWorkbook();
+    @ParameterizedTest
+    @CsvSource( WorkbookTest.VERSIONS)
+    public final void testSheetToJavaSettingParser( String version) throws ParseException, IOException {
+        Workbook workbook = getWorkbook( version);
         Sheet sheet1 = workbook.getSheetAt( 0);
         Sheet sheet2 = workbook.getSheetAt( 1);
         Sheet sheet3 = workbook.getSheetAt( 2);
@@ -64,7 +58,6 @@ public class SheetToJavaSettingParserTest extends WorkbookTest {
         Sheet sheet5 = workbook.getSheetAt( 4);
         String tag = "@SheetToJavaSetting";
         SheetToJavaSettingParser parser = new SheetToJavaSettingParser( tag);
-        Cell tagCell = null;
         Object data = null;
         List<SheetToJavaSettingInfo> list = null;
 
@@ -72,8 +65,8 @@ public class SheetToJavaSettingParserTest extends WorkbookTest {
         // parse( Sheet sheet, Cell tagCell, Object data)
         // ===============================================
         // No.1 パラメータ無し
-        tagCell = sheet1.getRow( 0).getCell( 0);
-        list = parser.parse( sheet1, tagCell, data);
+        Cell tagCell1 = sheet1.getRow( 0).getCell( 0);
+        list = parser.parse( sheet1, tagCell1, data);
         assertEquals( 2, list.size());
         assertEquals( "sheetName2", list.get( 0).getSheetName());
         assertEquals( "sheetName3", list.get( 1).getSheetName());
@@ -87,9 +80,9 @@ public class SheetToJavaSettingParserTest extends WorkbookTest {
         assertTrue( list.get( 1).isUnique());
 
         // No.2 パラメータ有り
-        tagCell = sheet1.getRow( 0).getCell( 6);
+        Cell tagCell2 = sheet1.getRow( 0).getCell( 6);
         list.clear();
-        list = parser.parse( sheet1, tagCell, data);
+        list = parser.parse( sheet1, tagCell2, data);
         assertEquals( 2, list.size());
         assertEquals( "sheetName1", list.get( 0).getSheetName());
         assertEquals( "sheetName2", list.get( 1).getSheetName());
@@ -103,9 +96,9 @@ public class SheetToJavaSettingParserTest extends WorkbookTest {
         assertFalse( list.get( 1).isUnique());
 
         // No.3 シート名セルがnull
-        tagCell = sheet2.getRow( 0).getCell( 0);
+        Cell tagCell3 = sheet2.getRow( 0).getCell( 0);
         list.clear();
-        list = parser.parse( sheet2, tagCell, data);
+        list = parser.parse( sheet2, tagCell3, data);
         assertEquals( 2, list.size());
         assertEquals( "sheetName1", list.get( 0).getSheetName());
         assertEquals( "sheetName2", list.get( 1).getSheetName());
@@ -119,9 +112,9 @@ public class SheetToJavaSettingParserTest extends WorkbookTest {
         assertTrue( list.get( 1).isUnique());
         
         // No.4 値セルがnull
-        tagCell = sheet2.getRow( 8).getCell( 0);
+        Cell tagCell4 = sheet2.getRow( 8).getCell( 0);
         list.clear();
-        list = parser.parse( sheet2, tagCell, data);
+        list = parser.parse( sheet2, tagCell4, data);
         assertEquals( 3, list.size());
         assertEquals( "sheetName1", list.get( 0).getSheetName());
         assertEquals( "sheetName2", list.get( 1).getSheetName());
@@ -140,35 +133,25 @@ public class SheetToJavaSettingParserTest extends WorkbookTest {
         assertTrue( list.get( 2).isUnique());
 
         // No.5 対象エンティティセルがnull
-        tagCell = sheet2.getRow( 16).getCell( 0);
-        list.clear();
-        try {
-            list = parser.parse( sheet2, tagCell, data);
-            fail( "ParseException expected, but no exception was thrown.");
-        } catch ( ParseException pe) {
-            Cell cell = pe.getCell();
-            assertEquals( 20, cell.getRow().getRowNum());
-            assertEquals( 2, cell.getColumnIndex());
-            System.out.println( "No.5:" + pe);
-        }
+        Cell tagCell5 = sheet2.getRow( 16).getCell( 0);
+        ParseException pe = assertThrows( ParseException.class, () -> parser.parse( sheet2, tagCell5, data));
+        Cell cell = pe.getCell();
+        assertEquals( 20, cell.getRow().getRowNum());
+        assertEquals( 2, cell.getColumnIndex());
+        System.out.println( "No.5:" + pe);
 
         // No.6 対象プロパティセルがnull
-        tagCell = sheet2.getRow( 24).getCell( 0);
-        list.clear();
-        try {
-            list = parser.parse( sheet2, tagCell, data);
-            fail( "ParseException expected, but no exception was thrown.");
-        } catch ( ParseException pe) {
-            Cell cell = pe.getCell();
-            assertEquals( 26, cell.getRow().getRowNum());
-            assertEquals( 3, cell.getColumnIndex());
-            System.out.println( "No.6:" + pe);
-        }
+        Cell tagCell6 = sheet2.getRow( 24).getCell( 0);
+        pe = assertThrows( ParseException.class, () -> parser.parse( sheet2, tagCell6, data));
+        cell = pe.getCell();
+        assertEquals( 26, cell.getRow().getRowNum());
+        assertEquals( 3, cell.getColumnIndex());
+        System.out.println( "No.6:" + pe);
 
         // No.7 重複不可セルがnull
-        tagCell = sheet2.getRow( 32).getCell( 0);
+        Cell tagCell7 = sheet2.getRow( 32).getCell( 0);
         list.clear();
-        list = parser.parse( sheet2, tagCell, data);
+        list = parser.parse( sheet2, tagCell7, data);
         assertEquals( 3, list.size());
         assertEquals( "sheetName1", list.get( 0).getSheetName());
         assertEquals( "sheetName2", list.get( 1).getSheetName());
@@ -187,9 +170,9 @@ public class SheetToJavaSettingParserTest extends WorkbookTest {
         assertTrue( list.get( 2).isUnique());
 
         // No.8 行がnull
-        tagCell = sheet2.getRow( 40).getCell( 0);
+        Cell tagCell8 = sheet2.getRow( 40).getCell( 0);
         list.clear();
-        list = parser.parse( sheet2, tagCell, data);
+        list = parser.parse( sheet2, tagCell8, data);
         assertEquals( 2, list.size());
         assertEquals( "sheetName1", list.get( 0).getSheetName());
         assertEquals( "sheetName2", list.get( 1).getSheetName());
@@ -203,9 +186,9 @@ public class SheetToJavaSettingParserTest extends WorkbookTest {
         assertFalse( list.get( 1).isUnique());
 
         // No.9 対象セルがすべてnullの行
-        tagCell = sheet2.getRow( 48).getCell( 0);
+        Cell tagCell9 = sheet2.getRow( 48).getCell( 0);
         list.clear();
-        list = parser.parse( sheet2, tagCell, data);
+        list = parser.parse( sheet2, tagCell9, data);
         assertEquals( 2, list.size());
         assertEquals( "sheetName1", list.get( 0).getSheetName());
         assertEquals( "sheetName2", list.get( 1).getSheetName());
@@ -219,9 +202,9 @@ public class SheetToJavaSettingParserTest extends WorkbookTest {
         assertFalse( list.get( 1).isUnique());
 
         // No.10 値が論理名タグ
-        tagCell = sheet2.getRow( 56).getCell( 0);
+        Cell tagCell10 = sheet2.getRow( 56).getCell( 0);
         list.clear();
-        list = parser.parse( sheet2, tagCell, data);
+        list = parser.parse( sheet2, tagCell10, data);
         assertEquals( 1, list.size());
         assertEquals( "sheetName1", list.get( 0).getSheetName());
         assertEquals( "@LNAME(プロパティ1)", list.get( 0).getValue());
@@ -230,22 +213,17 @@ public class SheetToJavaSettingParserTest extends WorkbookTest {
         assertFalse( list.get( 0).isUnique());
 
         // No.11 値が論理名タグ、対象プロパティセルがnull
-        tagCell = sheet2.getRow( 62).getCell( 0);
-        list.clear();
-        try {
-            list = parser.parse( sheet2, tagCell, data);
-            fail( "ParseException expected, but no exception was thrown.");
-        } catch ( ParseException pe) {
-            Cell cell = pe.getCell();
-            assertEquals( 64, cell.getRow().getRowNum());
-            assertEquals( 3, cell.getColumnIndex());
-            System.out.println( "No.11:" + pe);
-        }
+        Cell tagCell11 = sheet2.getRow( 62).getCell( 0);
+        pe = assertThrows( ParseException.class, () -> parser.parse( sheet2, tagCell11, data));
+        cell = pe.getCell();
+        assertEquals( 64, cell.getRow().getRowNum());
+        assertEquals( 3, cell.getColumnIndex());
+        System.out.println( "No.11:" + pe);
 
         // No.12 値がカスタムプロパティタグ
-        tagCell = sheet2.getRow( 68).getCell( 0);
+        Cell tagCell12 = sheet2.getRow( 68).getCell( 0);
         list.clear();
-        list = parser.parse( sheet2, tagCell, data);
+        list = parser.parse( sheet2, tagCell12, data);
         assertEquals( 1, list.size());
         assertEquals( "sheetName1", list.get( 0).getSheetName());
         assertEquals( "@TestChildEntity{childPropertyStr1=@LNAME(子プロパティ文字列1),childPropertyInt1=@LNAME(子プロパティ整数1)}", list.get( 0).getValue());
@@ -254,9 +232,9 @@ public class SheetToJavaSettingParserTest extends WorkbookTest {
         assertFalse( list.get( 0).isUnique());
 
         // No.13 値がカスタムプロパティタグ、対象プロパティセルがnull
-        tagCell = sheet2.getRow( 74).getCell( 0);
+        Cell tagCell13 = sheet2.getRow( 74).getCell( 0);
         list.clear();
-        list = parser.parse( sheet2, tagCell, data);
+        list = parser.parse( sheet2, tagCell13, data);
         assertEquals( 1, list.size());
         assertEquals( "sheetName1", list.get( 0).getSheetName());
         assertEquals( "@TestChildEntity{childPropertyStr1=@LNAME(子プロパティ文字列1),childPropertyInt1=@LNAME(子プロパティ整数1)}", list.get( 0).getValue());
@@ -265,9 +243,9 @@ public class SheetToJavaSettingParserTest extends WorkbookTest {
         assertFalse( list.get( 0).isUnique());
 
         // No.14 値がカスタムプロパティタグ、重複不可が○
-        tagCell = sheet2.getRow( 80).getCell( 0);
+        Cell tagCell14 = sheet2.getRow( 80).getCell( 0);
         list.clear();
-        list = parser.parse( sheet2, tagCell, data);
+        list = parser.parse( sheet2, tagCell14, data);
         assertEquals( 1, list.size());
         assertEquals( "sheetName1", list.get( 0).getSheetName());
         assertEquals( "@TestChildEntity{childPropertyStr1=@LNAME(子プロパティ文字列1),childPropertyInt1=@LNAME(子プロパティ整数1)}", list.get( 0).getValue());
@@ -276,21 +254,16 @@ public class SheetToJavaSettingParserTest extends WorkbookTest {
         assertFalse( list.get( 0).isUnique());
 
         // No.15 値がカスタムプロパティタグ、パラメータ部分が不正
-        tagCell = sheet2.getRow( 86).getCell( 0);
-        list.clear();
-        try {
-            list = parser.parse( sheet2, tagCell, data);
-            fail( "ParseException expected, but no exception was thrown.");
-        } catch (ParseException pe) {
-            Cell cell = pe.getCell();
-            assertEquals( 88, cell.getRow().getRowNum());
-            assertEquals( 1, cell.getColumnIndex());
-        }
+        Cell tagCell15 = sheet2.getRow( 86).getCell( 0);
+        pe = assertThrows( ParseException.class, () -> parser.parse( sheet2, tagCell15, data));
+        cell = pe.getCell();
+        assertEquals( 88, cell.getRow().getRowNum());
+        assertEquals( 1, cell.getColumnIndex());
 
         // No.16 文字列プロパティに数値
-        tagCell = sheet2.getRow( 92).getCell( 0);
+        Cell tagCell16 = sheet2.getRow( 92).getCell( 0);
         list.clear();
-        list = parser.parse( sheet2, tagCell, data);
+        list = parser.parse( sheet2, tagCell16, data);
         assertEquals( 1, list.size());
         assertEquals( "sheetName1", list.get( 0).getSheetName());
         assertEquals( "10", list.get( 0).getValue());
@@ -299,74 +272,49 @@ public class SheetToJavaSettingParserTest extends WorkbookTest {
         assertFalse( list.get( 0).isUnique());
 
         // No.17 整数プロパティに文字列
-        tagCell = sheet2.getRow( 98).getCell( 0);
-        list.clear();
-        try {
-            list = parser.parse( sheet2, tagCell, data);
-            fail( "ParseException expected, but no exception was thrown.");
-        } catch ( ParseException pe) {
-            Cell cell = pe.getCell();
-            assertEquals( 100, cell.getRow().getRowNum());
-            assertEquals( 1, cell.getColumnIndex());
-            System.out.println( "No.17:" + pe);
-        }
+        Cell tagCell17 = sheet2.getRow( 98).getCell( 0);
+        pe = assertThrows( ParseException.class, () -> parser.parse( sheet2, tagCell17, data));
+        cell = pe.getCell();
+        assertEquals( 100, cell.getRow().getRowNum());
+        assertEquals( 1, cell.getColumnIndex());
+        System.out.println( "No.17:" + pe);
 
         // No.18 日付プロパティに文字列
-        tagCell = sheet2.getRow( 104).getCell( 0);
-        list.clear();
-        try {
-            list = parser.parse( sheet2, tagCell, data);
-            fail( "ParseException expected, but no exception was thrown.");
-        } catch ( ParseException pe) {
-            Cell cell = pe.getCell();
-            assertEquals( 106, cell.getRow().getRowNum());
-            assertEquals( 1, cell.getColumnIndex());
-            System.out.println( "No.18:" + pe);
-        }
+        Cell tagCell18 = sheet2.getRow( 104).getCell( 0);
+        pe = assertThrows( ParseException.class, () -> parser.parse( sheet2, tagCell18, data));
+        cell = pe.getCell();
+        assertEquals( 106, cell.getRow().getRowNum());
+        assertEquals( 1, cell.getColumnIndex());
+        System.out.println( "No.18:" + pe);
 
         // No.19 存在しないエンティティ
-        tagCell = sheet2.getRow( 110).getCell( 0);
-        list.clear();
-        try {
-            list = parser.parse( sheet2, tagCell, data);
-            fail( "ParseException expected, but no exception was thrown.");
-        } catch ( ParseException pe) {
-            Cell cell = pe.getCell();
-            assertEquals( 112, cell.getRow().getRowNum());
-            assertEquals( 2, cell.getColumnIndex());
-            System.out.println( "No.19:" + pe);
-        }
+        Cell tagCell19 = sheet2.getRow( 110).getCell( 0);
+        pe = assertThrows( ParseException.class, () -> parser.parse( sheet2, tagCell19, data));
+        cell = pe.getCell();
+        assertEquals( 112, cell.getRow().getRowNum());
+        assertEquals( 2, cell.getColumnIndex());
+        System.out.println( "No.19:" + pe);
 
         // No.20 存在しないプロパティ
-        tagCell = sheet2.getRow( 116).getCell( 0);
-        list.clear();
-        try {
-            list = parser.parse( sheet2, tagCell, data);
-            fail( "ParseException expected, but no exception was thrown.");
-        } catch ( ParseException pe) {
-            Cell cell = pe.getCell();
-            assertEquals( 118, cell.getRow().getRowNum());
-            assertEquals( 3, cell.getColumnIndex());
-            System.out.println( "No.20:" + pe);
-        }
+        Cell tagCell20 = sheet2.getRow( 116).getCell( 0);
+        pe = assertThrows( ParseException.class, () -> parser.parse( sheet2, tagCell20, data));
+        cell = pe.getCell();
+        assertEquals( 118, cell.getRow().getRowNum());
+        assertEquals( 3, cell.getColumnIndex());
+        System.out.println( "No.20:" + pe);
 
         // No.21 対象エンティティが抽象クラス
-        tagCell = sheet2.getRow( 122).getCell( 0);
-        list.clear();
-        try {
-            list = parser.parse( sheet2, tagCell, data);
-            fail( "ParseException expected, but no exception was thrown.");
-        } catch ( ParseException pe) {
-            Cell cell = pe.getCell();
-            assertEquals( 124, cell.getRow().getRowNum());
-            assertEquals( 3, cell.getColumnIndex());
-            System.out.println( "No.21:" + pe);
-        }
+        Cell tagCell21 = sheet2.getRow( 122).getCell( 0);
+        pe = assertThrows( ParseException.class, () -> parser.parse( sheet2, tagCell21, data));
+        cell = pe.getCell();
+        assertEquals( 124, cell.getRow().getRowNum());
+        assertEquals( 3, cell.getColumnIndex());
+        System.out.println( "No.21:" + pe);
 
         // No.22 マイナス範囲指定
-        tagCell = sheet3.getRow( 5).getCell( 0);
+        Cell tagCell22 = sheet3.getRow( 5).getCell( 0);
         list.clear();
-        list = parser.parse( sheet3, tagCell, data);
+        list = parser.parse( sheet3, tagCell22, data);
         assertEquals( 3, list.size());
         assertEquals( "sheetName1", list.get( 0).getSheetName());
         assertEquals( "sheetName2", list.get( 1).getSheetName());
@@ -385,48 +333,33 @@ public class SheetToJavaSettingParserTest extends WorkbookTest {
         assertTrue( list.get( 2).isUnique());
 
         // No.23 DataRowFrom > DataRowTo
-        tagCell = sheet3.getRow( 9).getCell( 0);
-        list.clear();
-        try {
-            list = parser.parse( sheet3, tagCell, data);
-            fail( "ParseException expected, but no exception was thrown.");
-        } catch ( ParseException pe) {
-            Cell cell = pe.getCell();
-            assertEquals( 9, cell.getRow().getRowNum());
-            assertEquals( 0, cell.getColumnIndex());
-            System.out.println( "No.23:" + pe);
-        }
+        Cell tagCell23 = sheet3.getRow( 9).getCell( 0);
+        pe = assertThrows( ParseException.class, () -> parser.parse( sheet3, tagCell23, data));
+        cell = pe.getCell();
+        assertEquals( 9, cell.getRow().getRowNum());
+        assertEquals( 0, cell.getColumnIndex());
+        System.out.println( "No.23:" + pe);
 
         // No.24 DataRowFrom不正（値が空）
-        tagCell = sheet3.getRow( 17).getCell( 0);
-        list.clear();
-        try {
-            list = parser.parse( sheet3, tagCell, data);
-            fail( "ParseException expected, but no exception was thrown.");
-        } catch ( ParseException pe) {
-            Cell cell = pe.getCell();
-            assertEquals( 17, cell.getRow().getRowNum());
-            assertEquals( 0, cell.getColumnIndex());
-            System.out.println( "No.24:" + pe);
-        }
+        Cell tagCell24 = sheet3.getRow( 17).getCell( 0);
+        pe = assertThrows( ParseException.class, () -> parser.parse( sheet3, tagCell24, data));
+        cell = pe.getCell();
+        assertEquals( 17, cell.getRow().getRowNum());
+        assertEquals( 0, cell.getColumnIndex());
+        System.out.println( "No.24:" + pe);
 
         // No.25 DataRowTo不正（値が空）
-        tagCell = sheet3.getRow( 21).getCell( 0);
-        list.clear();
-        try {
-            list = parser.parse( sheet3, tagCell, data);
-            fail( "ParseException expected, but no exception was thrown.");
-        } catch ( ParseException pe) {
-            Cell cell = pe.getCell();
-            assertEquals( 21, cell.getRow().getRowNum());
-            assertEquals( 0, cell.getColumnIndex());
-            System.out.println( "No.25:" + pe);
-        }
+        Cell tagCell25 = sheet3.getRow( 21).getCell( 0);
+        pe = assertThrows( ParseException.class, () -> parser.parse( sheet3, tagCell25, data));
+        cell = pe.getCell();
+        assertEquals( 21, cell.getRow().getRowNum());
+        assertEquals( 0, cell.getColumnIndex());
+        System.out.println( "No.25:" + pe);
 
         // No.26 ResultKey指定
-        tagCell = sheet3.getRow( 25).getCell( 0);
+        Cell tagCell26 = sheet3.getRow( 25).getCell( 0);
         list.clear();
-        list = parser.parse( sheet3, tagCell, data);
+        list = parser.parse( sheet3, tagCell26, data);
         assertEquals( 2, list.size());
         assertEquals( "sheetName1", list.get( 0).getSheetName());
         assertEquals( "sheetName2", list.get( 1).getSheetName());
@@ -440,61 +373,41 @@ public class SheetToJavaSettingParserTest extends WorkbookTest {
         assertTrue( list.get( 1).isUnique());
 
         // No.27 DataRowFrom不正テスト（1行目でデータ開始行にマイナスを指定）
-        tagCell = sheet4.getRow( 0).getCell( 0);
-        list.clear();
-        try {
-            list = parser.parse( sheet4, tagCell, data);
-            fail( "ParseException expected, but no exception was thrown.");
-        } catch ( ParseException pe) {
-            Cell cell = pe.getCell();
-            assertEquals( 0, cell.getRow().getRowNum());
-            assertEquals( 0, cell.getColumnIndex());
-            System.out.println( "No.27:" + pe);
-        }
+        Cell tagCell27 = sheet4.getRow( 0).getCell( 0);
+        pe = assertThrows( ParseException.class, () -> parser.parse( sheet4, tagCell27, data));
+        cell = pe.getCell();
+        assertEquals( 0, cell.getRow().getRowNum());
+        assertEquals( 0, cell.getColumnIndex());
+        System.out.println( "No.27:" + pe);
 
         // No.28 DataRowTo不正テスト（1行目でデータ終了行にマイナスを指定）
-        tagCell = sheet4.getRow( 0).getCell( 4);
-        list.clear();
-        try {
-            list = parser.parse( sheet4, tagCell, data);
-            fail( "ParseException expected, but no exception was thrown.");
-        } catch ( ParseException pe) {
-            Cell cell = pe.getCell();
-            assertEquals( 0, cell.getRow().getRowNum());
-            assertEquals( 4, cell.getColumnIndex());
-            System.out.println( "No.28:" + pe);
-        }
+        Cell tagCell28 = sheet4.getRow( 0).getCell( 4);
+        pe = assertThrows( ParseException.class, () -> parser.parse( sheet4, tagCell28, data));
+        cell = pe.getCell();
+        assertEquals( 0, cell.getRow().getRowNum());
+        assertEquals( 4, cell.getColumnIndex());
+        System.out.println( "No.28:" + pe);
 
         // No.29 DataRowFrom不正テスト（最終行でデータ開始行にプラスを指定）
-        tagCell = sheet4.getRow( 15).getCell( 0);
-        list.clear();
-        try {
-            list = parser.parse( sheet4, tagCell, data);
-            fail( "ParseException expected, but no exception was thrown.");
-        } catch ( ParseException pe) {
-            Cell cell = pe.getCell();
-            assertEquals( 15, cell.getRow().getRowNum());
-            assertEquals( 0, cell.getColumnIndex());
-            System.out.println( "No.29:" + pe);
-        }
+        Cell tagCell29 = sheet4.getRow( 15).getCell( 0);
+        pe = assertThrows( ParseException.class, () -> parser.parse( sheet4, tagCell29, data));
+        cell = pe.getCell();
+        assertEquals( 15, cell.getRow().getRowNum());
+        assertEquals( 0, cell.getColumnIndex());
+        System.out.println( "No.29:" + pe);
 
         // No.30 DataRowTo不正テスト（最終行でデータ終了行にプラスを指定）
-        tagCell = sheet4.getRow( 15).getCell( 4);
-        list.clear();
-        try {
-            list = parser.parse( sheet4, tagCell, data);
-            fail( "ParseException expected, but no exception was thrown.");
-        } catch ( ParseException pe) {
-            Cell cell = pe.getCell();
-            assertEquals( 15, cell.getRow().getRowNum());
-            assertEquals( 4, cell.getColumnIndex());
-            System.out.println( "No.30:" + pe);
-        }
+        Cell tagCell30 = sheet4.getRow( 15).getCell( 4);
+        pe = assertThrows( ParseException.class, () -> parser.parse( sheet4, tagCell30, data));
+        cell = pe.getCell();
+        assertEquals( 15, cell.getRow().getRowNum());
+        assertEquals( 4, cell.getColumnIndex());
+        System.out.println( "No.30:" + pe);
 
         // No.31 デフォルトタグ
-        parser = new SheetToJavaSettingParser();
-        tagCell = sheet1.getRow( 0).getCell( 0);
-        list = parser.parse( sheet1, tagCell, data);
+        SheetToJavaSettingParser defaultParser = new SheetToJavaSettingParser();
+        Cell tagCell31 = sheet1.getRow( 0).getCell( 0);
+        list = defaultParser.parse( sheet1, tagCell31, data);
         assertEquals( 2, list.size());
         assertEquals( "sheetName2", list.get( 0).getSheetName());
         assertEquals( "sheetName3", list.get( 1).getSheetName());
@@ -508,22 +421,17 @@ public class SheetToJavaSettingParserTest extends WorkbookTest {
         assertTrue( list.get( 1).isUnique());
         
         // No.32 存在しないシート名
-        tagCell = sheet5.getRow( 0).getCell( 0);
-        list.clear();
-        try {
-            list = parser.parse( sheet5, tagCell, data);
-            fail( "ParseException expected, but no exception was thrown.");
-        } catch ( ParseException pe) {
-            Cell cell = pe.getCell();
-            assertEquals( 4, cell.getRow().getRowNum());
-            assertEquals( 0, cell.getColumnIndex());
-            System.out.println( "No.21:" + pe);
-        }
+        Cell tagCell32 = sheet5.getRow( 0).getCell( 0);
+        pe = assertThrows( ParseException.class, () -> defaultParser.parse( sheet5, tagCell32, data));
+        cell = pe.getCell();
+        assertEquals( 4, cell.getRow().getRowNum());
+        assertEquals( 0, cell.getColumnIndex());
+        System.out.println( "No.21:" + pe);
 
         // No.33 シート名がブランク
-        tagCell = sheet5.getRow( 10).getCell( 0);
+        Cell tagCell33 = sheet5.getRow( 10).getCell( 0);
         list.clear();
-        list = parser.parse( sheet5, tagCell, data);
+        list = defaultParser.parse( sheet5, tagCell33, data);
         assertEquals( 2, list.size());
         assertEquals( 2, list.size());
         assertEquals( "sheetName1", list.get( 0).getSheetName());
