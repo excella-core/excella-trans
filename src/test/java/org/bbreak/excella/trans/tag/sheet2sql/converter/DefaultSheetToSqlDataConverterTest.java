@@ -95,7 +95,8 @@ public class DefaultSheetToSqlDataConverterTest {
         
         // No.9 データ型：整数、値：小数
         Object object9 = 10.5;
-        assertThrows( ParseException.class, () -> converter.convert( object9, dataTypeInteger, settingInfo));
+        result = converter.convert( object9, dataTypeInteger, settingInfo);
+        assertEquals( "10", result);
         
         // No.10 データ型：数値、値：文字列
         Object object10 = "あああ";
