@@ -67,10 +67,10 @@ public class SheetToJavaParserTest extends WorkbookTest {
         assertEquals( tag + "Setting", list.get( 1).getSettingTagName());
         assertEquals( "sheetName2", list.get( 0).getSheetName());
         assertEquals( "sheetName3", list.get( 1).getSheetName());
-        assertEquals( new Integer( 2), list.get( 0).getLogicalNameRowNum());
-        assertEquals( new Integer( 3), list.get( 1).getLogicalNameRowNum());
-        assertEquals( new Integer( 5), list.get( 0).getValueRowNum());
-        assertEquals( new Integer( 6), list.get( 1).getValueRowNum());
+        assertEquals( 2, list.get( 0).getLogicalNameRowNum());
+        assertEquals( 3, list.get( 1).getLogicalNameRowNum());
+        assertEquals( 5, list.get( 0).getValueRowNum());
+        assertEquals( 6, list.get( 1).getValueRowNum());
 
         // No.2 パラメータ有り
         Cell tagCell2 = sheet1.getRow( 0).getCell( 4);
@@ -80,10 +80,10 @@ public class SheetToJavaParserTest extends WorkbookTest {
         assertEquals( "@SettingTagName", list.get( 0).getSettingTagName());
         assertEquals( "sheetName1", list.get( 0).getSheetName());
         assertEquals( "sheetName2", list.get( 1).getSheetName());
-        assertEquals( new Integer( 7), list.get( 0).getLogicalNameRowNum());
-        assertEquals( new Integer( 8), list.get( 1).getLogicalNameRowNum());
-        assertEquals( new Integer( 10), list.get( 0).getValueRowNum());
-        assertEquals( new Integer( 11), list.get( 1).getValueRowNum());
+        assertEquals( 7, list.get( 0).getLogicalNameRowNum());
+        assertEquals( 8, list.get( 1).getLogicalNameRowNum());
+        assertEquals( 10, list.get( 0).getValueRowNum());
+        assertEquals( 11, list.get( 1).getValueRowNum());
 
         // No.3 シート名セルがnull
         Cell tagCell3 = sheet2.getRow( 0).getCell( 0);
@@ -93,10 +93,10 @@ public class SheetToJavaParserTest extends WorkbookTest {
         assertEquals( "@SheetToJavaSetting", list.get( 0).getSettingTagName());
         assertEquals( "sheetName1", list.get( 0).getSheetName());
         assertEquals( "sheetName2", list.get( 1).getSheetName());
-        assertEquals( new Integer( 2), list.get( 0).getLogicalNameRowNum());
-        assertEquals( new Integer( 3), list.get( 1).getLogicalNameRowNum());
-        assertEquals( new Integer( 5), list.get( 0).getValueRowNum());
-        assertEquals( new Integer( 6), list.get( 1).getValueRowNum());
+        assertEquals( 2, list.get( 0).getLogicalNameRowNum());
+        assertEquals( 3, list.get( 1).getLogicalNameRowNum());
+        assertEquals( 5, list.get( 0).getValueRowNum());
+        assertEquals( 6, list.get( 1).getValueRowNum());
 
         // No.4 論理名行Noセルがnull
         Cell tagCell4 = sheet2.getRow( 8).getCell( 0);
@@ -121,10 +121,10 @@ public class SheetToJavaParserTest extends WorkbookTest {
         assertEquals( 2, list.size());
         assertEquals( "sheetName1", list.get( 0).getSheetName());
         assertEquals( "sheetName2", list.get( 1).getSheetName());
-        assertEquals( new Integer( 17), list.get( 0).getLogicalNameRowNum());
-        assertEquals( new Integer( 18), list.get( 1).getLogicalNameRowNum());
-        assertEquals( new Integer( 19), list.get( 0).getValueRowNum());
-        assertEquals( new Integer( 20), list.get( 1).getValueRowNum());
+        assertEquals( 17, list.get( 0).getLogicalNameRowNum());
+        assertEquals( 18, list.get( 1).getLogicalNameRowNum());
+        assertEquals( 19, list.get( 0).getValueRowNum());
+        assertEquals( 20, list.get( 1).getValueRowNum());
 
         // No.7 対象セルがすべてnullの行
         Cell tagCell7 = sheet2.getRow( 32).getCell( 0);
@@ -133,10 +133,10 @@ public class SheetToJavaParserTest extends WorkbookTest {
         assertEquals( 2, list.size());
         assertEquals( "sheetName1", list.get( 0).getSheetName());
         assertEquals( "sheetName2", list.get( 1).getSheetName());
-        assertEquals( new Integer( 21), list.get( 0).getLogicalNameRowNum());
-        assertEquals( new Integer( 22), list.get( 1).getLogicalNameRowNum());
-        assertEquals( new Integer( 23), list.get( 0).getValueRowNum());
-        assertEquals( new Integer( 24), list.get( 1).getValueRowNum());
+        assertEquals( 21, list.get( 0).getLogicalNameRowNum());
+        assertEquals( 22, list.get( 1).getLogicalNameRowNum());
+        assertEquals( 23, list.get( 0).getValueRowNum());
+        assertEquals( 24, list.get( 1).getValueRowNum());
 
         // No.8 論理名行Noが数値以外
         Cell tagCell8 = sheet2.getRow( 40).getCell( 0);
@@ -162,12 +162,12 @@ public class SheetToJavaParserTest extends WorkbookTest {
         assertEquals( "sheetName1", list.get( 0).getSheetName());
         assertEquals( "sheetName2", list.get( 1).getSheetName());
         assertEquals( "sheetName3", list.get( 2).getSheetName());
-        assertEquals( new Integer( 1), list.get( 0).getLogicalNameRowNum());
-        assertEquals( new Integer( 2), list.get( 1).getLogicalNameRowNum());
-        assertEquals( new Integer( 3), list.get( 2).getLogicalNameRowNum());
-        assertEquals( new Integer( 4), list.get( 0).getValueRowNum());
-        assertEquals( new Integer( 5), list.get( 1).getValueRowNum());
-        assertEquals( new Integer( 6), list.get( 2).getValueRowNum());
+        assertEquals( 1, list.get( 0).getLogicalNameRowNum());
+        assertEquals( 2, list.get( 1).getLogicalNameRowNum());
+        assertEquals( 3, list.get( 2).getLogicalNameRowNum());
+        assertEquals( 4, list.get( 0).getValueRowNum());
+        assertEquals( 5, list.get( 1).getValueRowNum());
+        assertEquals( 6, list.get( 2).getValueRowNum());
 
         // No.11 DataRowFrom > DataRowTo
         Cell tagCell11 = sheet3.getRow( 9).getCell( 0);
@@ -252,10 +252,10 @@ public class SheetToJavaParserTest extends WorkbookTest {
         assertEquals( tag + "Setting", list.get( 1).getSettingTagName());
         assertEquals( "sheetName2", list.get( 0).getSheetName());
         assertEquals( "sheetName3", list.get( 1).getSheetName());
-        assertEquals( new Integer( 2), list.get( 0).getLogicalNameRowNum());
-        assertEquals( new Integer( 3), list.get( 1).getLogicalNameRowNum());
-        assertEquals( new Integer( 5), list.get( 0).getValueRowNum());
-        assertEquals( new Integer( 6), list.get( 1).getValueRowNum());
+        assertEquals( 2, list.get( 0).getLogicalNameRowNum());
+        assertEquals( 3, list.get( 1).getLogicalNameRowNum());
+        assertEquals( 5, list.get( 0).getValueRowNum());
+        assertEquals( 6, list.get( 1).getValueRowNum());
 
         // No.21 存在しないシート名
         Cell tagCell21 = sheet5.getRow( 0).getCell( 0);
@@ -274,9 +274,9 @@ public class SheetToJavaParserTest extends WorkbookTest {
         assertEquals( tag + "Setting", list.get( 1).getSettingTagName());
         assertEquals( "sheetName1", list.get( 0).getSheetName());
         assertEquals( "sheetName2", list.get( 1).getSheetName());
-        assertEquals( new Integer( 4), list.get( 0).getLogicalNameRowNum());
-        assertEquals( new Integer( 5), list.get( 1).getLogicalNameRowNum());
-        assertEquals( new Integer( 7), list.get( 0).getValueRowNum());
-        assertEquals( new Integer( 8), list.get( 1).getValueRowNum());
+        assertEquals( 4, list.get( 0).getLogicalNameRowNum());
+        assertEquals( 5, list.get( 1).getLogicalNameRowNum());
+        assertEquals( 7, list.get( 0).getValueRowNum());
+        assertEquals( 8, list.get( 1).getValueRowNum());
     }
 }

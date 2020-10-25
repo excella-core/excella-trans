@@ -55,12 +55,12 @@ public class DefaultSheetToSqlDataConverterTest {
         assertEquals( "'あああ'", result);
         
         // No.2 データ型：文字列、値：数値
-        Object object2 = new Double(10.0);
+        Object object2 = 10.0;
         result = converter.convert( object2, dataTypeString, settingInfo);
         assertEquals( "'10.0'", result);
         
         // No.3 データ型：文字列、値：整数
-        Object object3 = new Integer(10);
+        Object object3 = 10;
         result = converter.convert( object3, dataTypeString, settingInfo);
         assertEquals( "'10'", result);
         
@@ -74,7 +74,7 @@ public class DefaultSheetToSqlDataConverterTest {
         
         // No.5 データ型：数値、値：数値
         String dataTypeNumeric = "数値";
-        Object object5 = new Double(10.0);
+        Object object5 = 10.0;
         result = converter.convert( object5, dataTypeNumeric, settingInfo);
         assertEquals( "10.0", result);
         
@@ -84,17 +84,17 @@ public class DefaultSheetToSqlDataConverterTest {
         
         // No.7 データ型：整数、値：数値
         String dataTypeInteger = "整数";
-        Object object7 = new Integer(10);
+        Object object7 = 10;
         result = converter.convert( object7, dataTypeInteger, settingInfo);
         assertEquals( "10", result);
         
         // No.8 データ型：整数、値：小数
-        Object object8 = new Double(10.0);
+        Object object8 = 10.0;
         result = converter.convert( object8, dataTypeInteger, settingInfo);
         assertEquals( "10", result);
         
         // No.9 データ型：整数、値：小数
-        Object object9 = new Double(10.5);
+        Object object9 = 10.5;
         assertThrows( ParseException.class, () -> converter.convert( object9, dataTypeInteger, settingInfo));
         
         // No.10 データ型：数値、値：文字列
@@ -143,7 +143,7 @@ public class DefaultSheetToSqlDataConverterTest {
         result = converter.convert( object11StrNumOne, dataTypeBoolean, settingInfo);
         assertEquals( "TRUE", result);
         
-        Object object11IntOne = new Integer(1);
+        Object object11IntOne = 1;
         result = converter.convert( object11IntOne, dataTypeBoolean, settingInfo);
         assertEquals( "TRUE", result);
         
@@ -188,7 +188,7 @@ public class DefaultSheetToSqlDataConverterTest {
         result = converter.convert( object12StrZero, dataTypeBoolean, settingInfo);
         assertEquals( "FALSE", result);
         
-        Object object12IntZero = new Integer(0);
+        Object object12IntZero = 0;
         result = converter.convert( object12IntZero, dataTypeBoolean, settingInfo);
         assertEquals( "FALSE", result);
         
@@ -253,12 +253,12 @@ public class DefaultSheetToSqlDataConverterTest {
         assertEquals( "CURRENT_TIMESTAMP", result);
         
         // No.24 データ型：関数、値：数値
-        Object object24 = new Double(10.0);
+        Object object24 = 10.0;
         result = converter.convert( object24, dataTypeFunction, settingInfo);
         assertEquals( "10.0", result);
         
         // No.25 データ型：関数、値：整数
-        Object object25 = new Integer(10);
+        Object object25 = 10;
         result = converter.convert( object25, dataTypeFunction, settingInfo);
         assertEquals( "10", result);
         

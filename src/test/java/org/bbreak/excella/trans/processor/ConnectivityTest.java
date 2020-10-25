@@ -86,15 +86,15 @@ public class ConnectivityTest extends WorkbookTest {
         assertEquals( "文字列2", (( TestEntity2) javaResults.get( 6)).getPropertyStr2());
         assertEquals( "文字列3", (( TestEntity2) javaResults.get( 7)).getPropertyStr2());
         assertEquals( "文字列4", (( TestEntity2) javaResults.get( 8)).getPropertyStr2());
-        assertEquals( new Integer( 10), (( TestEntity1) javaResults.get( 0)).getPropertyInt1());
-        assertEquals( new Integer( 20), (( TestEntity1) javaResults.get( 1)).getPropertyInt1());
-        assertEquals( new Integer( 30), (( TestEntity1) javaResults.get( 2)).getPropertyInt1());
-        assertEquals( new Integer( 40), (( TestEntity1) javaResults.get( 3)).getPropertyInt1());
-        assertEquals( new Integer( 10), (( TestEntity2) javaResults.get( 4)).getPropertyInt2());
-        assertEquals( new Integer( 10), (( TestEntity2) javaResults.get( 5)).getPropertyInt2());
-        assertEquals( new Integer( 10), (( TestEntity2) javaResults.get( 6)).getPropertyInt2());
-        assertEquals( new Integer( 10), (( TestEntity2) javaResults.get( 7)).getPropertyInt2());
-        assertEquals( new Integer( 10), (( TestEntity2) javaResults.get( 8)).getPropertyInt2());
+        assertEquals( 10, (( TestEntity1) javaResults.get( 0)).getPropertyInt1());
+        assertEquals( 20, (( TestEntity1) javaResults.get( 1)).getPropertyInt1());
+        assertEquals( 30, (( TestEntity1) javaResults.get( 2)).getPropertyInt1());
+        assertEquals( 40, (( TestEntity1) javaResults.get( 3)).getPropertyInt1());
+        assertEquals( 10, (( TestEntity2) javaResults.get( 4)).getPropertyInt2());
+        assertEquals( 10, (( TestEntity2) javaResults.get( 5)).getPropertyInt2());
+        assertEquals( 10, (( TestEntity2) javaResults.get( 6)).getPropertyInt2());
+        assertEquals( 10, (( TestEntity2) javaResults.get( 7)).getPropertyInt2());
+        assertEquals( 10, (( TestEntity2) javaResults.get( 8)).getPropertyInt2());
         assertEquals( DateFormat.getDateInstance().parse( "2009/06/08"), (( TestEntity1) javaResults.get( 0)).getPropertyDate1());
         assertEquals( DateFormat.getDateInstance().parse( "2009/06/08"), (( TestEntity1) javaResults.get( 1)).getPropertyDate1());
         assertEquals( DateFormat.getDateInstance().parse( "2009/06/08"), (( TestEntity1) javaResults.get( 2)).getPropertyDate1());
@@ -108,10 +108,10 @@ public class ConnectivityTest extends WorkbookTest {
         assertEquals( "文字列2", (( TestEntity1) javaResults.get( 1)).getChild().getChildPropertyStr1());
         assertEquals( "文字列3", (( TestEntity1) javaResults.get( 2)).getChild().getChildPropertyStr1());
         assertEquals( "文字列4", (( TestEntity1) javaResults.get( 3)).getChild().getChildPropertyStr1());
-        assertEquals( new Integer( 10), (( TestEntity1) javaResults.get( 0)).getChild().getChildPropertyInt1());
-        assertEquals( new Integer( 20), (( TestEntity1) javaResults.get( 1)).getChild().getChildPropertyInt1());
-        assertEquals( new Integer( 30), (( TestEntity1) javaResults.get( 2)).getChild().getChildPropertyInt1());
-        assertEquals( new Integer( 40), (( TestEntity1) javaResults.get( 3)).getChild().getChildPropertyInt1());
+        assertEquals( 10, (( TestEntity1) javaResults.get( 0)).getChild().getChildPropertyInt1());
+        assertEquals( 20, (( TestEntity1) javaResults.get( 1)).getChild().getChildPropertyInt1());
+        assertEquals( 30, (( TestEntity1) javaResults.get( 2)).getChild().getChildPropertyInt1());
+        assertEquals( 40, (( TestEntity1) javaResults.get( 3)).getChild().getChildPropertyInt1());
 
         // 値の検証：SheetToSql
         sheetData = bookData.getSheetData( "Connectivity 2");

@@ -108,9 +108,9 @@ public class SheetToJavaExecuterTest extends WorkbookTest {
         assertEquals( "String1", (( TestEntity1) results.get( 0)).getPropertyStr1());
         assertEquals( "String2", (( TestEntity1) results.get( 1)).getPropertyStr1());
         assertEquals( "String3", (( TestEntity1) results.get( 2)).getPropertyStr1());
-        assertEquals( new Integer( 10), (( TestEntity1) results.get( 0)).getPropertyInt1());
-        assertEquals( new Integer( 10), (( TestEntity1) results.get( 1)).getPropertyInt1());
-        assertEquals( new Integer( 10), (( TestEntity1) results.get( 2)).getPropertyInt1());
+        assertEquals( 10, (( TestEntity1) results.get( 0)).getPropertyInt1());
+        assertEquals( 10, (( TestEntity1) results.get( 1)).getPropertyInt1());
+        assertEquals( 10, (( TestEntity1) results.get( 2)).getPropertyInt1());
 
         // No.2 SheetToJavaSettingInfoのデータが削除されていることを確認
         assertNull( sheetData1.get( settingTagName));
@@ -138,9 +138,9 @@ public class SheetToJavaExecuterTest extends WorkbookTest {
         assertEquals( "String1", (( TestEntity1) results.get( 0)).getPropertyStr1());
         assertEquals( "String2", (( TestEntity1) results.get( 1)).getPropertyStr1());
         assertEquals( "String3", (( TestEntity1) results.get( 2)).getPropertyStr1());
-        assertEquals( new Integer( 10), (( TestEntity1) results.get( 0)).getPropertyInt1());
-        assertEquals( new Integer( 10), (( TestEntity1) results.get( 1)).getPropertyInt1());
-        assertEquals( new Integer( 10), (( TestEntity1) results.get( 2)).getPropertyInt1());
+        assertEquals( 10, (( TestEntity1) results.get( 0)).getPropertyInt1());
+        assertEquals( 10, (( TestEntity1) results.get( 1)).getPropertyInt1());
+        assertEquals( 10, (( TestEntity1) results.get( 2)).getPropertyInt1());
 
         // No.7 存在しないシート名を指定
         SheetToJavaParseInfo parseInfo2 = new SheetToJavaParseInfo();
@@ -200,7 +200,7 @@ public class SheetToJavaExecuterTest extends WorkbookTest {
         results.clear();
         results = ( List<Object>) sheetData9.get( tagName);
         assertEquals( 1, results.size());
-        assertEquals( new Integer( 20), (( TestEntity1) results.get( 0)).getPropertyInt1());
+        assertEquals( 20, (( TestEntity1) results.get( 0)).getPropertyInt1());
 
         // No.10 データ行にnull行あり
         SheetToJavaParseInfo parseInfo5 = new SheetToJavaParseInfo();
@@ -220,8 +220,8 @@ public class SheetToJavaExecuterTest extends WorkbookTest {
         results.clear();
         results = ( List<Object>) sheetData10.get( tagName);
         assertEquals( 2, results.size());
-        assertEquals( new Integer( 10), (( TestEntity1) results.get( 0)).getPropertyInt1());
-        assertEquals( new Integer( 20), (( TestEntity1) results.get( 1)).getPropertyInt1());
+        assertEquals( 10, (( TestEntity1) results.get( 0)).getPropertyInt1());
+        assertEquals( 20, (( TestEntity1) results.get( 1)).getPropertyInt1());
 
         // No.11 データ行にnullセルあり
         String sheetName3 = "testSheet (3)";
@@ -436,9 +436,9 @@ public class SheetToJavaExecuterTest extends WorkbookTest {
         assertEquals( "String1", (( TestEntity1) results.get( 0)).getPropertyStr1());
         assertEquals( "String2", (( TestEntity1) results.get( 1)).getPropertyStr1());
         assertEquals( "String3", (( TestEntity1) results.get( 2)).getPropertyStr1());
-        assertEquals( new Integer( 100), (( TestEntity1) results.get( 0)).getPropertyInt1());
+        assertEquals( 100, (( TestEntity1) results.get( 0)).getPropertyInt1());
         assertNull( (( TestEntity1) results.get( 1)).getPropertyInt1());
-        assertEquals( new Integer( 300), (( TestEntity1) results.get( 2)).getPropertyInt1());
+        assertEquals( 300, (( TestEntity1) results.get( 2)).getPropertyInt1());
         assertEquals( DateFormat.getDateInstance().parse( "2009/1/1"), (( TestEntity1) results.get( 0)).getPropertyDate1());
         assertEquals( DateFormat.getDateInstance().parse( "2009/3/1"), (( TestEntity1) results.get( 1)).getPropertyDate1());
         assertEquals( DateFormat.getDateInstance().parse( "2009/4/1"), (( TestEntity1) results.get( 2)).getPropertyDate1());
@@ -485,13 +485,13 @@ public class SheetToJavaExecuterTest extends WorkbookTest {
         assertEquals( "String1", (( TestEntity2) results.get( 4)).getPropertyStr2());
         assertEquals( "String2", (( TestEntity2) results.get( 5)).getPropertyStr2());
         assertEquals( "String3", (( TestEntity2) results.get( 6)).getPropertyStr2());
-        assertEquals( new Integer( 100), (( TestEntity1) results.get( 0)).getPropertyInt1());
+        assertEquals( 100, (( TestEntity1) results.get( 0)).getPropertyInt1());
         assertNull( (( TestEntity1) results.get( 1)).getPropertyInt1());
-        assertEquals( new Integer( 300), (( TestEntity1) results.get( 2)).getPropertyInt1());
-        assertEquals( new Integer( 100), (( TestEntity2) results.get( 3)).getPropertyInt2());
-        assertEquals( new Integer( 100), (( TestEntity2) results.get( 4)).getPropertyInt2());
+        assertEquals( 300, (( TestEntity1) results.get( 2)).getPropertyInt1());
+        assertEquals( 100, (( TestEntity2) results.get( 3)).getPropertyInt2());
+        assertEquals( 100, (( TestEntity2) results.get( 4)).getPropertyInt2());
         assertNull( (( TestEntity2) results.get( 5)).getPropertyInt2());
-        assertEquals( new Integer( 300), (( TestEntity2) results.get( 6)).getPropertyInt2());
+        assertEquals( 300, (( TestEntity2) results.get( 6)).getPropertyInt2());
         assertEquals( DateFormat.getDateInstance().parse( "2009/1/1"), (( TestEntity1) results.get( 0)).getPropertyDate1());
         assertEquals( DateFormat.getDateInstance().parse( "2009/3/1"), (( TestEntity1) results.get( 1)).getPropertyDate1());
         assertEquals( DateFormat.getDateInstance().parse( "2009/4/1"), (( TestEntity1) results.get( 2)).getPropertyDate1());
