@@ -20,12 +20,13 @@
 
 package org.bbreak.excella.trans.tag.sheet2sql;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.apache.poi.ss.usermodel.Cell;
@@ -34,7 +35,8 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.bbreak.excella.core.exception.ParseException;
 import org.bbreak.excella.trans.WorkbookTest;
 import org.bbreak.excella.trans.tag.sheet2sql.model.SheetToSqlSettingInfo;
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 /**
  * SheetToSqlSettingParserテストクラス
@@ -43,18 +45,10 @@ import org.junit.Test;
  */
 public class SheetToSqlSettingParserTest extends WorkbookTest {
 
-    /**
-     * コンストラクタ
-     * 
-     * @param version Excelファイルのバージョン
-     */
-    public SheetToSqlSettingParserTest( String version) {
-        super( version);
-    }
-
-    @Test
-    public final void testSheetToSqlSettingParser() throws ParseException {
-        Workbook workbook = getWorkbook();
+    @ParameterizedTest
+    @CsvSource( WorkbookTest.VERSIONS)
+    public final void testSheetToSqlSettingParser( String version) throws ParseException, IOException {
+        Workbook workbook = getWorkbook( version);
         Sheet sheet1 = workbook.getSheetAt( 0);
         Sheet sheet2 = workbook.getSheetAt( 1);
         Sheet sheet3 = workbook.getSheetAt( 2);
@@ -62,7 +56,6 @@ public class SheetToSqlSettingParserTest extends WorkbookTest {
         Sheet sheet5 = workbook.getSheetAt( 4);
         String tag = "@SheetToSqlSetting";
         SheetToSqlSettingParser parser = new SheetToSqlSettingParser( tag);
-        Cell tagCell = null;
         Object data = null;
         List<SheetToSqlSettingInfo> list = null;
 
@@ -70,8 +63,8 @@ public class SheetToSqlSettingParserTest extends WorkbookTest {
         // parse( Sheet sheet, Cell tagCell, Object data)
         // ===============================================
         // No.1 パラメータ無し
-        tagCell = sheet1.getRow( 0).getCell( 0);
-        list = parser.parse( sheet1, tagCell, data);
+        Cell tagCell1 = sheet1.getRow( 0).getCell( 0);
+        list = parser.parse( sheet1, tagCell1, data);
         assertEquals( 2, list.size());
         assertEquals( "sheetName2", list.get( 0).getSheetName());
         assertEquals( "sheetName3", list.get( 1).getSheetName());
@@ -87,9 +80,9 @@ public class SheetToSqlSettingParserTest extends WorkbookTest {
         assertEquals( "dataType3", list.get( 1).getDataType());
 
         // No.2 パラメータ有り
-        tagCell = sheet1.getRow( 0).getCell( 7);
+        Cell tagCell2 = sheet1.getRow( 0).getCell( 7);
         list.clear();
-        list = parser.parse( sheet1, tagCell, data);
+        list = parser.parse( sheet1, tagCell2, data);
         assertEquals( 2, list.size());
         assertEquals( "sheetName1", list.get( 0).getSheetName());
         assertEquals( "sheetName2", list.get( 1).getSheetName());
@@ -105,9 +98,9 @@ public class SheetToSqlSettingParserTest extends WorkbookTest {
         assertEquals( "dataType5", list.get( 1).getDataType());
 
         // No.3 シート名セルがnull
-        tagCell = sheet2.getRow( 0).getCell( 0);
+        Cell tagCell3 = sheet2.getRow( 0).getCell( 0);
         list.clear();
-        list = parser.parse( sheet2, tagCell, data);
+        list = parser.parse( sheet2, tagCell3, data);
         assertEquals( 2, list.size());
         assertEquals( "sheetName1", list.get( 0).getSheetName());
         assertEquals( "sheetName2", list.get( 1).getSheetName());
@@ -121,9 +114,9 @@ public class SheetToSqlSettingParserTest extends WorkbookTest {
         assertEquals( "dataType3", list.get( 1).getDataType());
         
         // No.4 値セルがnull
-        tagCell = sheet2.getRow( 8).getCell( 0);
+        Cell tagCell4 = sheet2.getRow( 8).getCell( 0);
         list.clear();
-        list = parser.parse( sheet2, tagCell, data);
+        list = parser.parse( sheet2, tagCell4, data);
         assertEquals( 3, list.size());
         assertEquals( "sheetName1", list.get( 0).getSheetName());
         assertEquals( "sheetName2", list.get( 1).getSheetName());
@@ -142,35 +135,25 @@ public class SheetToSqlSettingParserTest extends WorkbookTest {
         assertEquals( "dataType6", list.get( 2).getDataType());
 
         // No.5 対象テーブルセルがnull
-        tagCell = sheet2.getRow( 16).getCell( 0);
-        list.clear();
-        try {
-            list = parser.parse( sheet2, tagCell, data);
-            fail();
-        } catch ( ParseException pe) {
-            Cell cell = pe.getCell();
-            assertEquals( 20, cell.getRow().getRowNum());
-            assertEquals( 2, cell.getColumnIndex());
-            System.out.println( "No.5:" + pe);
-        }
+        Cell tagCell5 = sheet2.getRow( 16).getCell( 0);
+        ParseException pe = assertThrows( ParseException.class, () -> parser.parse( sheet2, tagCell5, data));
+        Cell cell = pe.getCell();
+        assertEquals( 20, cell.getRow().getRowNum());
+        assertEquals( 2, cell.getColumnIndex());
+        System.out.println( "No.5:" + pe);
 
         // No.6 対象カラムセルがnull
-        tagCell = sheet2.getRow( 24).getCell( 0);
-        list.clear();
-        try {
-            list = parser.parse( sheet2, tagCell, data);
-            fail();
-        } catch ( ParseException pe) {
-            Cell cell = pe.getCell();
-            assertEquals( 26, cell.getRow().getRowNum());
-            assertEquals( 3, cell.getColumnIndex());
-            System.out.println( "No.6:" + pe);
-        }
+        Cell tagCell6 = sheet2.getRow( 24).getCell( 0);
+        pe = assertThrows( ParseException.class, () -> parser.parse( sheet2, tagCell6, data));
+        cell = pe.getCell();
+        assertEquals( 26, cell.getRow().getRowNum());
+        assertEquals( 3, cell.getColumnIndex());
+        System.out.println( "No.6:" + pe);
 
         // No.7 重複不可セルがnull
-        tagCell = sheet2.getRow( 32).getCell( 0);
+        Cell tagCell7 = sheet2.getRow( 32).getCell( 0);
         list.clear();
-        list = parser.parse( sheet2, tagCell, data);
+        list = parser.parse( sheet2, tagCell7, data);
         assertEquals( 3, list.size());
         assertEquals( "sheetName1", list.get( 0).getSheetName());
         assertEquals( "sheetName2", list.get( 1).getSheetName());
@@ -192,9 +175,9 @@ public class SheetToSqlSettingParserTest extends WorkbookTest {
         assertEquals( "dataType14", list.get( 2).getDataType());
 
         // No.8 データ型セルがnull
-        tagCell = sheet2.getRow( 40).getCell( 0);
+        Cell tagCell8 = sheet2.getRow( 40).getCell( 0);
         list.clear();
-        list = parser.parse( sheet2, tagCell, data);
+        list = parser.parse( sheet2, tagCell8, data);
         assertEquals( 3, list.size());
         assertEquals( "sheetName1", list.get( 0).getSheetName());
         assertEquals( "sheetName2", list.get( 1).getSheetName());
@@ -216,9 +199,9 @@ public class SheetToSqlSettingParserTest extends WorkbookTest {
         assertNull( list.get( 2).getDataType());
 
         // No.9 行がnull
-        tagCell = sheet2.getRow( 48).getCell( 0);
+        Cell tagCell9 = sheet2.getRow( 48).getCell( 0);
         list.clear();
-        list = parser.parse( sheet2, tagCell, data);
+        list = parser.parse( sheet2, tagCell9, data);
         assertEquals( 2, list.size());
         assertEquals( "sheetName1", list.get( 0).getSheetName());
         assertEquals( "sheetName2", list.get( 1).getSheetName());
@@ -234,9 +217,9 @@ public class SheetToSqlSettingParserTest extends WorkbookTest {
         assertEquals( "dataType18", list.get( 1).getDataType());
 
         // No.10 対象セルがすべてnullの行
-        tagCell = sheet2.getRow( 56).getCell( 0);
+        Cell tagCell10 = sheet2.getRow( 56).getCell( 0);
         list.clear();
-        list = parser.parse( sheet2, tagCell, data);
+        list = parser.parse( sheet2, tagCell10, data);
         assertEquals( 2, list.size());
         assertEquals( "sheetName1", list.get( 0).getSheetName());
         assertEquals( "sheetName2", list.get( 1).getSheetName());
@@ -252,9 +235,9 @@ public class SheetToSqlSettingParserTest extends WorkbookTest {
         assertEquals( "dataType20", list.get( 1).getDataType());
 
         // No.11 値が論理名タグ
-        tagCell = sheet2.getRow( 64).getCell( 0);
+        Cell tagCell11 = sheet2.getRow( 64).getCell( 0);
         list.clear();
-        list = parser.parse( sheet2, tagCell, data);
+        list = parser.parse( sheet2, tagCell11, data);
         assertEquals( 2, list.size());
         assertEquals( "sheetName1", list.get( 0).getSheetName());
         assertEquals( "sheetName2", list.get( 1).getSheetName());
@@ -270,9 +253,9 @@ public class SheetToSqlSettingParserTest extends WorkbookTest {
         assertEquals( "dataType22", list.get( 1).getDataType());
 
         // No.12 マイナス範囲指定
-        tagCell = sheet3.getRow( 5).getCell( 0);
+        Cell tagCell12 = sheet3.getRow( 5).getCell( 0);
         list.clear();
-        list = parser.parse( sheet3, tagCell, data);
+        list = parser.parse( sheet3, tagCell12, data);
         assertEquals( 3, list.size());
         assertEquals( "sheetName1", list.get( 0).getSheetName());
         assertEquals( "sheetName2", list.get( 1).getSheetName());
@@ -294,48 +277,33 @@ public class SheetToSqlSettingParserTest extends WorkbookTest {
         assertEquals( "dataType3", list.get( 2).getDataType());
 
         // No.13 DataRowFrom > DataRowTo
-        tagCell = sheet3.getRow( 9).getCell( 0);
-        list.clear();
-        try {
-            list = parser.parse( sheet3, tagCell, data);
-            fail();
-        } catch ( ParseException pe) {
-            Cell cell = pe.getCell();
-            assertEquals( 9, cell.getRow().getRowNum());
-            assertEquals( 0, cell.getColumnIndex());
-            System.out.println( "No.13:" + pe);
-        }
+        Cell tagCell13 = sheet3.getRow( 9).getCell( 0);
+        pe = assertThrows( ParseException.class, () -> parser.parse( sheet3, tagCell13, data));
+        cell = pe.getCell();
+        assertEquals( 9, cell.getRow().getRowNum());
+        assertEquals( 0, cell.getColumnIndex());
+        System.out.println( "No.13:" + pe);
 
         // No.14 DataRowFrom不正（値が空）
-        tagCell = sheet3.getRow( 17).getCell( 0);
-        list.clear();
-        try {
-            list = parser.parse( sheet3, tagCell, data);
-            fail();
-        } catch ( ParseException pe) {
-            Cell cell = pe.getCell();
-            assertEquals( 17, cell.getRow().getRowNum());
-            assertEquals( 0, cell.getColumnIndex());
-            System.out.println( "No.14:" + pe);
-        }
+        Cell tagCell14 = sheet3.getRow( 17).getCell( 0);
+        pe = assertThrows( ParseException.class, () -> parser.parse( sheet3, tagCell14, data));
+        cell = pe.getCell();
+        assertEquals( 17, cell.getRow().getRowNum());
+        assertEquals( 0, cell.getColumnIndex());
+        System.out.println( "No.14:" + pe);
 
         // No.15 DataRowTo不正（値が空）
-        tagCell = sheet3.getRow( 21).getCell( 0);
-        list.clear();
-        try {
-            list = parser.parse( sheet3, tagCell, data);
-            fail();
-        } catch ( ParseException pe) {
-            Cell cell = pe.getCell();
-            assertEquals( 21, cell.getRow().getRowNum());
-            assertEquals( 0, cell.getColumnIndex());
-            System.out.println( "No.15:" + pe);
-        }
+        Cell tagCell15 = sheet3.getRow( 21).getCell( 0);
+        pe = assertThrows( ParseException.class, () -> parser.parse( sheet3, tagCell15, data));
+        cell = pe.getCell();
+        assertEquals( 21, cell.getRow().getRowNum());
+        assertEquals( 0, cell.getColumnIndex());
+        System.out.println( "No.15:" + pe);
 
         // No.16 ResultKey指定
-        tagCell = sheet3.getRow( 25).getCell( 0);
+        Cell tagCell16 = sheet3.getRow( 25).getCell( 0);
         list.clear();
-        list = parser.parse( sheet3, tagCell, data);
+        list = parser.parse( sheet3, tagCell16, data);
         assertEquals( 2, list.size());
         assertEquals( "sheetName1", list.get( 0).getSheetName());
         assertEquals( "sheetName2", list.get( 1).getSheetName());
@@ -351,61 +319,41 @@ public class SheetToSqlSettingParserTest extends WorkbookTest {
         assertEquals( "dataType8", list.get( 1).getDataType());
 
         // No.17 DataRowFrom不正テスト（1行目でデータ開始行にマイナスを指定）
-        tagCell = sheet4.getRow( 0).getCell( 0);
-        list.clear();
-        try {
-            list = parser.parse( sheet4, tagCell, data);
-            fail();
-        } catch ( ParseException pe) {
-            Cell cell = pe.getCell();
-            assertEquals( 0, cell.getRow().getRowNum());
-            assertEquals( 0, cell.getColumnIndex());
-            System.out.println( "No.17:" + pe);
-        }
+        Cell tagCell17 = sheet4.getRow( 0).getCell( 0);
+        pe = assertThrows( ParseException.class, () -> parser.parse( sheet4, tagCell17, data));
+        cell = pe.getCell();
+        assertEquals( 0, cell.getRow().getRowNum());
+        assertEquals( 0, cell.getColumnIndex());
+        System.out.println( "No.17:" + pe);
 
         // No.18 DataRowTo不正テスト（1行目でデータ終了行にマイナスを指定）
-        tagCell = sheet4.getRow( 0).getCell( 4);
-        list.clear();
-        try {
-            list = parser.parse( sheet4, tagCell, data);
-            fail();
-        } catch ( ParseException pe) {
-            Cell cell = pe.getCell();
-            assertEquals( 0, cell.getRow().getRowNum());
-            assertEquals( 4, cell.getColumnIndex());
-            System.out.println( "No.18:" + pe);
-        }
+        Cell tagCell18 = sheet4.getRow( 0).getCell( 4);
+        pe = assertThrows( ParseException.class, () -> parser.parse( sheet4, tagCell18, data));
+        cell = pe.getCell();
+        assertEquals( 0, cell.getRow().getRowNum());
+        assertEquals( 4, cell.getColumnIndex());
+        System.out.println( "No.18:" + pe);
 
         // No.19 DataRowFrom不正テスト（最終行でデータ開始行にプラスを指定）
-        tagCell = sheet4.getRow( 15).getCell( 0);
-        list.clear();
-        try {
-            list = parser.parse( sheet4, tagCell, data);
-            fail();
-        } catch ( ParseException pe) {
-            Cell cell = pe.getCell();
-            assertEquals( 15, cell.getRow().getRowNum());
-            assertEquals( 0, cell.getColumnIndex());
-            System.out.println( "No.19:" + pe);
-        }
+        Cell tagCell19 = sheet4.getRow( 15).getCell( 0);
+        pe = assertThrows( ParseException.class, () -> parser.parse( sheet4, tagCell19, data));
+        cell = pe.getCell();
+        assertEquals( 15, cell.getRow().getRowNum());
+        assertEquals( 0, cell.getColumnIndex());
+        System.out.println( "No.19:" + pe);
 
         // No.20 DataRowTo不正テスト（最終行でデータ終了行にプラスを指定）
-        tagCell = sheet4.getRow( 15).getCell( 4);
-        list.clear();
-        try {
-            list = parser.parse( sheet4, tagCell, data);
-            fail();
-        } catch ( ParseException pe) {
-            Cell cell = pe.getCell();
-            assertEquals( 15, cell.getRow().getRowNum());
-            assertEquals( 4, cell.getColumnIndex());
-            System.out.println( "No.20:" + pe);
-        }
+        Cell tagCell20 = sheet4.getRow( 15).getCell( 4);
+        pe = assertThrows( ParseException.class, () -> parser.parse( sheet4, tagCell20, data));
+        cell = pe.getCell();
+        assertEquals( 15, cell.getRow().getRowNum());
+        assertEquals( 4, cell.getColumnIndex());
+        System.out.println( "No.20:" + pe);
 
         // No.21 デフォルトタグ
-        parser = new SheetToSqlSettingParser();
-        tagCell = sheet1.getRow( 0).getCell( 0);
-        list = parser.parse( sheet1, tagCell, data);
+        SheetToSqlSettingParser defaultParser = new SheetToSqlSettingParser();
+        Cell tagCell21 = sheet1.getRow( 0).getCell( 0);
+        list = defaultParser.parse( sheet1, tagCell21, data);
         assertEquals( 2, list.size());
         assertEquals( "sheetName2", list.get( 0).getSheetName());
         assertEquals( "sheetName3", list.get( 1).getSheetName());
@@ -421,22 +369,17 @@ public class SheetToSqlSettingParserTest extends WorkbookTest {
         assertEquals( "dataType3", list.get( 1).getDataType());
 
         // No.22 存在しないシート名
-        tagCell = sheet5.getRow( 0).getCell( 0);
-        list.clear();
-        try {
-            list = parser.parse( sheet5, tagCell, data);
-            fail();
-        } catch ( ParseException pe) {
-            Cell cell = pe.getCell();
-            assertEquals( 4, cell.getRow().getRowNum());
-            assertEquals( 0, cell.getColumnIndex());
-            System.out.println( "No.21:" + pe);
-        }
+        Cell tagCell22 = sheet5.getRow( 0).getCell( 0);
+        pe = assertThrows( ParseException.class, () -> defaultParser.parse( sheet5, tagCell22, data));
+        cell = pe.getCell();
+        assertEquals( 4, cell.getRow().getRowNum());
+        assertEquals( 0, cell.getColumnIndex());
+        System.out.println( "No.21:" + pe);
 
         // No.23 シート名がブランク
-        tagCell = sheet5.getRow( 10).getCell( 0);
+        Cell tagCell23 = sheet5.getRow( 10).getCell( 0);
         list.clear();
-        list = parser.parse( sheet5, tagCell, data);
+        list = defaultParser.parse( sheet5, tagCell23, data);
         assertEquals( 2, list.size());
         assertEquals( 2, list.size());
         assertEquals( "sheetName1", list.get( 0).getSheetName());

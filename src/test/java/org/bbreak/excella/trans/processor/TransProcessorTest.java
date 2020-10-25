@@ -20,11 +20,11 @@
 
 package org.bbreak.excella.trans.processor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.util.List;
@@ -44,7 +44,8 @@ import org.bbreak.excella.core.listener.SheetParseListener;
 import org.bbreak.excella.core.tag.TagParser;
 import org.bbreak.excella.trans.WorkbookTest;
 import org.bbreak.excella.trans.listener.TransProcessListener;
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 /**
  * TransProcessorテストクラス
@@ -53,19 +54,11 @@ import org.junit.Test;
  */
 public class TransProcessorTest extends WorkbookTest {
 
-    /**
-     * コンストラクタ
-     * 
-     * @param version Excelファイルのバージョン
-     */
-    public TransProcessorTest( String version) {
-        super( version);
-    }
+    @ParameterizedTest
+    @CsvSource( WorkbookTest.VERSIONS)
+    public final void testTransProcessor( String version) throws ParseException, ExportException, IOException {
 
-    @Test
-    public final void testTransProcessor() throws ParseException, ExportException, IOException {
-
-        super.getWorkbook();
+        super.getWorkbook( version);
         String filePath = super.getFilepath();
         
         // ===============================================
@@ -75,13 +68,7 @@ public class TransProcessorTest extends WorkbookTest {
         TransProcessor processor = new TransProcessor( filePath);
 
         // ファイルパスが異常
-        filePath = "";
-        try {
-            processor = new TransProcessor( filePath);
-            fail();
-        } catch ( IOException e) {
-            // ファイル読込例外が発生
-        }
+        assertThrows( IOException.class, () -> new TransProcessor( ""));
 
         // ===============================================
         // processBook()
@@ -110,21 +97,11 @@ public class TransProcessorTest extends WorkbookTest {
         processor.processSheet( sheetName, data);
 
         // 存在しないシート名
-        sheetName = "Sheet2";
-        try {
-            processor.processSheet( sheetName, data);
-            fail();
-        } catch ( NullPointerException e) {
-            // 例外が発生
-        }
+        String unknwonSheetName = "Sheet2";
+        assertThrows( NullPointerException.class, () -> processor.processSheet( unknwonSheetName, data));
 
         // シート名にnullを設定
-        try {
-            processor.processSheet( null, data);
-            fail();
-        } catch ( NullPointerException e) {
-            // 例外が発生
-        }
+        assertThrows( NullPointerException.class, () -> processor.processSheet( null, data));
 
         // ===============================================
         // isDefaultSqlTag( String tag)

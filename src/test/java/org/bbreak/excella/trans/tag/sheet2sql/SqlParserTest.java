@@ -20,9 +20,10 @@
 
 package org.bbreak.excella.trans.tag.sheet2sql;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.apache.poi.ss.usermodel.Cell;
@@ -30,7 +31,8 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.bbreak.excella.core.exception.ParseException;
 import org.bbreak.excella.trans.WorkbookTest;
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 /**
  * SqlParserテストクラス
@@ -39,18 +41,10 @@ import org.junit.Test;
  */
 public class SqlParserTest extends WorkbookTest {
 
-    /**
-     * コンストラクタ
-     * 
-     * @param version Excelファイルのバージョン
-     */
-    public SqlParserTest( String version) {
-        super( version);
-    }
-
-    @Test
-    public final void testSqlParser() throws ParseException {
-        Workbook workbook = getWorkbook();
+    @ParameterizedTest
+    @CsvSource( WorkbookTest.VERSIONS)
+    public final void testSqlParser( String version) throws ParseException, IOException {
+        Workbook workbook = getWorkbook( version);
         Sheet sheet = workbook.getSheetAt( 0);
         SqlParser sqlParser = new SqlParser( "@Sql");
         Cell tagCell = null;
@@ -84,16 +78,11 @@ public class SqlParserTest extends WorkbookTest {
         assertEquals( 2, list.size());
 
         // No.4 例外テスト（データ無し）
-        tagCell = sheet.getRow( 13).getCell( 20);
-        list.clear();
-        try {
-            list = sqlParser.parse( sheet, tagCell, data);
-            fail();
-        } catch ( ParseException pe) {
-            Cell cell = pe.getCell();
-            assertEquals( 13, cell.getRow().getRowNum());
-            assertEquals( 20, cell.getColumnIndex());
-        }
+        Cell tagCell4 = sheet.getRow( 13).getCell( 20);
+        ParseException pe = assertThrows( ParseException.class, () -> sqlParser.parse( sheet, tagCell4, data));
+        Cell cell = pe.getCell();
+        assertEquals( 13, cell.getRow().getRowNum());
+        assertEquals( 20, cell.getColumnIndex());
 
         // No.5 デフォルトタグ
         SqlParser sqlParser2 = new SqlParser();

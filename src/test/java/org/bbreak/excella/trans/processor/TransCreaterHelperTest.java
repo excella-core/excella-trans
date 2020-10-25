@@ -20,9 +20,9 @@
 
 package org.bbreak.excella.trans.processor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.List;
 
@@ -45,7 +45,7 @@ import org.bbreak.excella.trans.tag.sheet2sql.SheetToSqlSettingParser;
 import org.bbreak.excella.trans.tag.sheet2sql.SqlParser;
 import org.bbreak.excella.trans.tag.sheet2sql.TruncateCascadeParser;
 import org.bbreak.excella.trans.tag.sheet2sql.TruncateParser;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * TransCreaterHelperテストクラス
@@ -53,15 +53,6 @@ import org.junit.Test;
  * @since 1.0
  */
 public class TransCreaterHelperTest extends WorkbookTest {
-
-    /**
-     * コンストラクタ
-     * 
-     * @param version Excelファイルのバージョン
-     */
-    public TransCreaterHelperTest( String version) {
-        super( version);
-    }
 
     @Test
     public final void testTransCreaterHelperProcessor() throws Exception {
