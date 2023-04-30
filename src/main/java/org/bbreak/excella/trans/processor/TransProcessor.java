@@ -20,15 +20,13 @@
 
 package org.bbreak.excella.trans.processor;
 
-import java.io.FileInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.bbreak.excella.core.BookController;
 import org.bbreak.excella.core.BookData;
 import org.bbreak.excella.core.SheetData;
@@ -112,19 +110,7 @@ public class TransProcessor {
      * @throws IOException ファイルの読み込みに失敗した場合
      */
     private Workbook getWorkbook( String filePath) throws IOException {
-
-        Workbook workbook = null;
-        if ( filePath.endsWith( BookController.XSSF_SUFFIX)) {
-            // XSSF形式
-            workbook = new XSSFWorkbook( filePath);
-        } else {
-            // HSSF形式
-            FileInputStream stream = new FileInputStream( filePath);
-            POIFSFileSystem fs = new POIFSFileSystem( stream);
-            workbook = new HSSFWorkbook( fs);
-            stream.close();
-        }
-        return workbook;
+        return WorkbookFactory.create(new File(filePath));
     }
 
     /**
