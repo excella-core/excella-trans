@@ -20,15 +20,13 @@
 
 package org.bbreak.excella.trans.processor;
 
-import java.io.FileInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.bbreak.excella.core.BookController;
 import org.bbreak.excella.core.BookData;
 import org.bbreak.excella.core.SheetData;
@@ -74,9 +72,9 @@ public class TransProcessor {
      * @param filePath 対象Excelファイルパス
      * @throws IOException ファイルの読み込みに失敗した場合
      */
-    public TransProcessor( String filePath) throws IOException {
+    public TransProcessor(String filePath) throws IOException {
         // 初期化処理
-        init( filePath);
+        init(filePath);
     }
 
     /**
@@ -85,22 +83,22 @@ public class TransProcessor {
      * @param filePath 対象Excelファイルパス
      * @throws IOException ファイルの読み込みに失敗した場合
      */
-    private void init( String filePath) throws IOException {
+    private void init(String filePath) throws IOException {
 
         // ワークブック取得
-        this.workbook = getWorkbook( filePath);
+        this.workbook = getWorkbook(filePath);
 
         // コントローラ生成
-        this.controller = new BookController( workbook);
+        this.controller = new BookController(workbook);
 
         // デフォルトタグパーサ追加
-        for ( TagParser<?> tagParser : TransCreateHelper.getDefaultTagParsers()) {
-            addTagParser( tagParser);
+        for (TagParser<?> tagParser : TransCreateHelper.getDefaultTagParsers()) {
+            addTagParser(tagParser);
         }
 
         // デフォルトシート処理リスナ追加
-        for ( SheetParseListener listener : TransCreateHelper.getDefaultSheetParseListeners()) {
-            addSheetParseListener( listener);
+        for (SheetParseListener listener : TransCreateHelper.getDefaultSheetParseListeners()) {
+            addSheetParseListener(listener);
         }
     }
 
@@ -111,31 +109,19 @@ public class TransProcessor {
      * @return workbook パース例外
      * @throws IOException ファイルの読み込みに失敗した場合
      */
-    private Workbook getWorkbook( String filePath) throws IOException {
-
-        Workbook workbook = null;
-        if ( filePath.endsWith( BookController.XSSF_SUFFIX)) {
-            // XSSF形式
-            workbook = new XSSFWorkbook( filePath);
-        } else {
-            // HSSF形式
-            FileInputStream stream = new FileInputStream( filePath);
-            POIFSFileSystem fs = new POIFSFileSystem( stream);
-            workbook = new HSSFWorkbook( fs);
-            stream.close();
-        }
-        return workbook;
+    private Workbook getWorkbook(String filePath) throws IOException {
+        return WorkbookFactory.create(new File(filePath));
     }
 
     /**
      * ブック解析を実行する
      * 
      * @return bookData ブックデータ
-     * @throws ParseException パース例外
+     * @throws ParseException  パース例外
      * @throws ExportException 出力処理例外
      */
     public BookData processBook() throws ParseException, ExportException {
-        return processBook( null);
+        return processBook(null);
     }
 
     /**
@@ -143,21 +129,21 @@ public class TransProcessor {
      * 
      * @param data TagParser.parseメソッドまで引き継がれる処理データ
      * @return bookData ブックデータ
-     * @throws ParseException パース例外
+     * @throws ParseException  パース例外
      * @throws ExportException 出力処理例外
      */
-    public BookData processBook( Object data) throws ParseException, ExportException {
+    public BookData processBook(Object data) throws ParseException, ExportException {
 
         // ブック解析前処理
-        for ( TransProcessListener listener : processListeners) {
-            listener.preBookParse( workbook);
+        for (TransProcessListener listener : processListeners) {
+            listener.preBookParse(workbook);
         }
 
-        controller.parseBook( data);
+        controller.parseBook(data);
 
         // ブック解析後処理
-        for ( TransProcessListener listener : processListeners) {
-            listener.postBookParse( workbook, controller.getBookData());
+        for (TransProcessListener listener : processListeners) {
+            listener.postBookParse(workbook, controller.getBookData());
         }
 
         return controller.getBookData();
@@ -168,12 +154,12 @@ public class TransProcessor {
      * 
      * @param sheetName シート名
      * @return sheetData シートデータ
-     * @throws ParseException パース例外
+     * @throws ParseException  パース例外
      * @throws ExportException 出力処理例外
      */
-    public SheetData processSheet( String sheetName) throws ParseException, ExportException {
+    public SheetData processSheet(String sheetName) throws ParseException, ExportException {
 
-        return processSheet( sheetName, null);
+        return processSheet(sheetName, null);
 
     }
 
@@ -181,15 +167,15 @@ public class TransProcessor {
      * シート解析を実行する
      * 
      * @param sheetName シート名
-     * @param data TagParser.parseメソッドまで引き継がれる処理データ
+     * @param data      TagParser.parseメソッドまで引き継がれる処理データ
      * @return sheetData シートデータ
-     * @throws ParseException パース例外
+     * @throws ParseException  パース例外
      * @throws ExportException 出力処理例外
      */
-    public SheetData processSheet( String sheetName, Object data) throws ParseException, ExportException {
+    public SheetData processSheet(String sheetName, Object data) throws ParseException, ExportException {
 
         SheetData sheetData = null;
-        sheetData = controller.parseSheet( sheetName, data);
+        sheetData = controller.parseSheet(sheetName, data);
         return sheetData;
     }
 
@@ -199,12 +185,12 @@ public class TransProcessor {
      * @param tag 判定するタグ
      * @return デフォルトSqlパーサのタグの場合はtrue、それ以外の場合はfalse
      */
-    public Boolean isDefaultSqlTag( String tag) {
+    public Boolean isDefaultSqlTag(String tag) {
 
         boolean result = false;
 
         List<String> defaultSqlTags = TransCreateHelper.getDefaultSqlTags();
-        if ( defaultSqlTags.contains( tag)) {
+        if (defaultSqlTags.contains(tag)) {
             result = true;
         }
 
@@ -225,8 +211,8 @@ public class TransProcessor {
      * 
      * @param tagParser 追加するタグパーサ
      */
-    public void addTagParser( TagParser<?> tagParser) {
-        this.controller.addTagParser( tagParser);
+    public void addTagParser(TagParser<?> tagParser) {
+        this.controller.addTagParser(tagParser);
     }
 
     /**
@@ -235,8 +221,8 @@ public class TransProcessor {
      * @param sheetName 対象シート名
      * @param tagParser 追加するタグパーサ
      */
-    public void addTagParser( String sheetName, TagParser<?> tagParser) {
-        this.controller.addTagParser( sheetName, tagParser);
+    public void addTagParser(String sheetName, TagParser<?> tagParser) {
+        this.controller.addTagParser(sheetName, tagParser);
     }
 
     /**
@@ -244,8 +230,8 @@ public class TransProcessor {
      * 
      * @param tag タグ
      */
-    public void removeTagParser( String tag) {
-        this.controller.removeTagParser( tag);
+    public void removeTagParser(String tag) {
+        this.controller.removeTagParser(tag);
     }
 
     /**
@@ -260,8 +246,8 @@ public class TransProcessor {
      * 
      * @param bookExporter ブック出力処理クラス
      */
-    public void addBookExporter( BookExporter bookExporter) {
-        this.controller.addBookExporter( bookExporter);
+    public void addBookExporter(BookExporter bookExporter) {
+        this.controller.addBookExporter(bookExporter);
     }
 
     /**
@@ -276,18 +262,18 @@ public class TransProcessor {
      * 
      * @param sheetExporter シート出力処理クラス
      */
-    public void addSheetExporter( SheetExporter sheetExporter) {
-        this.controller.addSheetExporter( sheetExporter);
+    public void addSheetExporter(SheetExporter sheetExporter) {
+        this.controller.addSheetExporter(sheetExporter);
     }
 
     /**
      * 対象シート指定でのシート出力処理クラス
      * 
-     * @param sheetName 対象シート名
+     * @param sheetName     対象シート名
      * @param sheetExporter シート出力処理クラス
      */
-    public void addSheetExporter( String sheetName, SheetExporter sheetExporter) {
-        this.controller.addSheetExporter( sheetName, sheetExporter);
+    public void addSheetExporter(String sheetName, SheetExporter sheetExporter) {
+        this.controller.addSheetExporter(sheetName, sheetExporter);
     }
 
     /**
@@ -311,8 +297,8 @@ public class TransProcessor {
      * 
      * @param errorHandler エラーハンドラ
      */
-    public void setErrorHandler( ParseErrorHandler errorHandler) {
-        this.controller.setErrorHandler( errorHandler);
+    public void setErrorHandler(ParseErrorHandler errorHandler) {
+        this.controller.setErrorHandler(errorHandler);
     }
 
     /**
@@ -320,18 +306,18 @@ public class TransProcessor {
      * 
      * @param sheetParseListener シート処理リスナクラス
      */
-    public void addSheetParseListener( SheetParseListener sheetParseListener) {
-        this.controller.addSheetParseListener( sheetParseListener);
+    public void addSheetParseListener(SheetParseListener sheetParseListener) {
+        this.controller.addSheetParseListener(sheetParseListener);
     }
 
     /**
      * 対象シート指定でのシート処理リスナクラスの追加
      * 
-     * @param sheetName 対象シート名
+     * @param sheetName          対象シート名
      * @param sheetParseListener シート処理リスナクラス
      */
-    public void addSheetParseListener( String sheetName, SheetParseListener sheetParseListener) {
-        this.controller.addSheetParseListener( sheetName, sheetParseListener);
+    public void addSheetParseListener(String sheetName, SheetParseListener sheetParseListener) {
+        this.controller.addSheetParseListener(sheetName, sheetParseListener);
     }
 
     /**
@@ -346,8 +332,8 @@ public class TransProcessor {
      * 
      * @param processListener 追加するプロセスリスナクラス
      */
-    public void addTransProcessListener( TransProcessListener processListener) {
-        this.processListeners.add( processListener);
+    public void addTransProcessListener(TransProcessListener processListener) {
+        this.processListeners.add(processListener);
     }
 
     /**
