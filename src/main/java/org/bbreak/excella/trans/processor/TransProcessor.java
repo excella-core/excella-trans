@@ -37,6 +37,8 @@ import org.bbreak.excella.core.exporter.sheet.SheetExporter;
 import org.bbreak.excella.core.handler.ParseErrorHandler;
 import org.bbreak.excella.core.listener.SheetParseListener;
 import org.bbreak.excella.core.tag.TagParser;
+import org.bbreak.excella.trans.listener.PostBookParseListener;
+import org.bbreak.excella.trans.listener.PreBookParseListener;
 import org.bbreak.excella.trans.listener.TransProcessListener;
 
 /**
@@ -62,9 +64,14 @@ public class TransProcessor {
     private Workbook workbook = null;
 
     /**
-     * プロセスリスナのリスト
+     * 解析前リスナー
      */
-    private List<TransProcessListener> processListeners = new ArrayList<TransProcessListener>();
+    private List<PreBookParseListener> preBookParseListeners = new ArrayList<>();
+
+    /**
+     * 解析後リスナー
+     */
+    private List<PostBookParseListener> postBookParseListeners = new ArrayList<>();
 
     /**
      * コンストラクタ
@@ -135,15 +142,15 @@ public class TransProcessor {
     public BookData processBook(Object data) throws ParseException, ExportException {
 
         // ブック解析前処理
-        for (TransProcessListener listener : processListeners) {
-            listener.preBookParse(workbook);
+        for ( PreBookParseListener listener : preBookParseListeners) {
+            listener.preBookParse( workbook);
         }
 
         controller.parseBook(data);
 
         // ブック解析後処理
-        for (TransProcessListener listener : processListeners) {
-            listener.postBookParse(workbook, controller.getBookData());
+        for ( PostBookParseListener listener : postBookParseListeners) {
+            listener.postBookParse( workbook, controller.getBookData());
         }
 
         return controller.getBookData();
@@ -332,14 +339,51 @@ public class TransProcessor {
      * 
      * @param processListener 追加するプロセスリスナクラス
      */
-    public void addTransProcessListener(TransProcessListener processListener) {
-        this.processListeners.add(processListener);
+    public void addTransProcessListener( TransProcessListener processListener) {
+        addPreBookParseListener( processListener);
+        addPostBookParseListener( processListener);
     }
 
     /**
-     * すべてのプロセスリスナクラスを削除する
+     * すべての解析前・解析後プロセスリスナクラスを削除する
      */
     public void clearTransProcessListeners() {
-        this.processListeners.clear();
+        clearPreBookParseListeners();
+        clearPostBookParseListeners();
     }
+
+    /**
+     * ブック解析前に実行されるリスナーを追加する
+     * @param preBookParseListener ブック解析前に実行される処理
+     * @since 2.1
+     */
+    public void addPreBookParseListener( PreBookParseListener preBookParseListener) {
+        this.preBookParseListeners.add( preBookParseListener);
+    }
+
+    /**
+     * ブック解析前に実行されるリスナーをクリアする
+     * @since 2.1
+     */
+    public void clearPreBookParseListeners() {
+        this.preBookParseListeners.clear();
+    }
+
+    /**
+     * ブック解析後に実行されるリスナーを追加する
+     * @param postBookParseListener ブック解析後に実行される処理
+     * @since 2.1
+     */
+    public void addPostBookParseListener( PostBookParseListener postBookParseListener) {
+        this.postBookParseListeners.add( postBookParseListener);
+    }
+
+    /**
+     * ブック解析後に実行されるリスナーを追加する
+     * @since 2.2
+     */
+    public void clearPostBookParseListeners() {
+        this.postBookParseListeners.clear();
+    }
+
 }

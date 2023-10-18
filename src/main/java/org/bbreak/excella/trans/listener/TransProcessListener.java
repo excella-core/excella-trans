@@ -20,31 +20,11 @@
 
 package org.bbreak.excella.trans.listener;
 
-import org.apache.poi.ss.usermodel.Workbook;
-import org.bbreak.excella.core.BookData;
-import org.bbreak.excella.core.exception.ParseException;
-
 /**
  * ブック処理前後に呼び出されるイベントリスナのインターフェイス
  * 
  * @since 1.0
  */
-public interface TransProcessListener {
+public interface TransProcessListener extends PreBookParseListener, PostBookParseListener {
 
-    /**
-     * ブック処理前に呼び出されるメソッド
-     * 
-     * @param workbook ワークブック
-     * @throws ParseException パース例外
-     */
-    void preBookParse( Workbook workbook) throws ParseException;
-
-    /**
-     * ブック処理後に呼び出されるメソッド
-     * 
-     * @param workbook ワークブック
-     * @param bookData 処理結果のデータ
-     * @throws ParseException パース例外
-     */
-    void postBookParse( Workbook workbook, BookData bookData) throws ParseException;
 }
